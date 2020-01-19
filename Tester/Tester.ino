@@ -1,6 +1,10 @@
+/*
+  Tester.ino - wiring tester.
+  Created by A. Ricci, January 18, 2020.
+  Released into the public domain.
+*/
 #include "Tester.h"
 
-Tester tester;
 
 byte nPinConn1=0;
 byte nPinConn2=0;
@@ -25,16 +29,40 @@ void loop() {
   }
   newData = false
   */
+
   nPinConn1 = 40;
   nPinConn2 = 40;
 
-  for(int i=0; i<nPinConn1; i=i+1){
+  bool boolMatrix[nPinConn1][nPinConn2];
+  Tester tester;    // this costructor need to accept npin in parameter. Tester tester(nPinConn1,nPinConn2);
+  
+
+  Serial.print("START TESTING\n\n");
+  for(int i=0; i<nPinConn1; i++){
     tester.setDEMUX(i);
-    for (int j=0; j<nPinConn2; j=j+1){
+    for (int j=0; j<nPinConn2; j++){
       tester.setMUX(j);
-      delay(10); //delay ms?
-      //boolMatrix[i][j] = tester.testWire;
+      delay(1); //delay us?
+      boolMatrix[i][j] = tester.testWire();
     }
+    Serial.print("pin ");
+    Serial.print( String(i+1));
+    Serial.print("/");
+    Serial.print( String(nPinConn1));
+    Serial.print(" tested \n");
   }
+  Serial.print(" DONE \n\n");
+  
   // insert here serial print versus PC
+  for(int i=0; i<nPinConn1; i++){
+    for (int j=0; j<nPinConn2; j++){
+      String text = String(boolMatrix[i][j],HEX);
+      Serial.print(text);  //serial.write() is only for char or byte
+    }
+    Serial.print("\n");
+  }
+  while(true){
+    
+  }
+  
 }
