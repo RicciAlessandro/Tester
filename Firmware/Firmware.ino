@@ -16,19 +16,25 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  /* put there a while loop that waits fpr serial data qith nPin_DEMUX e nPin_MUX
+  // put there a while loop that waits fpr serial data qith nPin_DEMUX e nPin_MUX
+  bool newData = false;
+  
+  Serial.write(byte(11));
+  Serial.write(byte(11));
   while(!newData) 
   {
-     if(Serial.available() > 0){
-        byte1=Serial.read();
-        byte1=Serial.read(); do i need 2 bytes for this data?
-        byte1=Serial.read();
-        newData=true; 
-        // do i need to clear Serial buffer?
+    Serial.write(byte(11));
+    if(Serial.available() > 0){
+      byte byte1=Serial.read();
+      //byte1=Serial.read(); do i need 2 bytes for this data?
+      //byte1=Serial.read();
+      newData=true; 
+      Serial.print("11");
+      // do i need to clear Serial buffer?
      }
   }
-  newData = false
-  */
+  newData = false;
+  
 
   nPinConn1 = 40;
   nPinConn2 = 40;
