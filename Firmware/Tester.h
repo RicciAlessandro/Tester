@@ -25,8 +25,7 @@
 #include "Arduino.h"
 
 
-class Tester
-{
+class Tester{
   public:
     Tester();                   //unique costructor
                                 //METHODS
@@ -37,8 +36,9 @@ class Tester
     //void incMUX();              //increment DEMUX/MUX but it's not so usefull
     //void incDEMUX();            //queste funzioni potrebbero essere private e comandate dal comando read
   private:
+    int _nPinDEMUX;
+    int _nPinMUX;  
     int _pinDEMUX[];              // è possibile definirlo come costante?
-    int _pinMUX[];     
+    int _pinMUX[];   
 };
-
 #endif
