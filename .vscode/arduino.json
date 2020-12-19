@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:nano",
     "configuration": "cpu=atmega328old",
-    "port": "COM3",
+    "port": "COM4",
     "sketch": "Firmware\\Firmware.ino"
 }
