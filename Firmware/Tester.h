@@ -22,7 +22,8 @@
 
 #define IN_SIGNAL 8     //26
 #define nPinAddress 6
-
+#define ledPin 9
+#define ledBusy 10
 #include "Arduino.h"
 
 
@@ -35,6 +36,8 @@ class Tester{
     void setMUX(int addr);
     void setNPinConn1(int nPin);  // numero di pin del connettore 2
     void setNPinConn2(int nPin);  // numero di pin del connettore 2
+    void setBusy();
+    void setFree();
     int getNPinConn1();  // numero di pin del connettore 2
     int getNPinConn2();  // numero di pin del connettore 2
     
@@ -42,6 +45,7 @@ class Tester{
     //void incMUX();              //increment DEMUX/MUX but it's not so usefull
     //void incDEMUX();            //queste funzioni potrebbero essere private e comandate dal comando read
   private:
+    bool _busy;
     int _nPinDEMUX = nPinAddress;               //numero dei pin fisici con i quali vengono comandati gli address
     int _nPinMUX = nPinAddress;
     int _nPinConn1;               // numero dei pin del connettore 1 sotto test

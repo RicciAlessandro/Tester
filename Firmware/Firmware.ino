@@ -10,9 +10,6 @@
 #include "stdafx.h"
 #include <iostream>
 */
-/*
-int nPinConn1=0;
-int nPinConn2=0;*/
 Tester tester;
 
 void setup() {
@@ -33,84 +30,17 @@ void loop() {
   int addr;
 
   Serial.print("attesa di un comando sulla SERIALE\n");
-  /*
-  while(!newData){
-    if(Serial.available() > 0){
-      byte1=Serial.read(); // legge il byte che indica l'operazione da svolgere
-      newData=true; 
-      Serial.print("operazione = ");
-      Serial.print(byte1);
-      Serial.print("\n");
-      //LEGGI nPinConn1e2, se non ci sono ritorna in ascolto da zero
-      if(Serial.available() > 0){
-        nPinConn1 = Serial.read();  // legge il byte che indica il numero di pin del primo connettore
-        Serial.print("nPinConn1 = ");
-        Serial.print(nPinConn1);
-        Serial.print("\n");
-      }
-      else{
-        Serial.print("no nPinConn1");
-        continue;  // se non c'è il byte ritorna in attesa di un comando sulla seriale
-      }
-      if(Serial.available() > 0){
-        nPinConn2 = Serial.read();  // legge il byte che indica il numero di pin del primo connettore
-        Serial.print("nPinConn2 = ");
-        Serial.print(nPinConn2);
-        Serial.print("\n");
-      }
-      else{
-        Serial.print("no nPinConn2");
-        continue;  // se non c'è il byte ritorna in attesa di un comando sulla seriale
-      }
-      // fai l'operazione richiesta contenuta nel byte letto sulla seriale
-      switch (byte1)
-      {
-      case 0:
-        Serial.print("test automatico\n");
-        testAumatico(nPinConn1,nPinConn2);
-        Serial.print("-DONE-\n");
-        break;
-      case 1:
-        if(Serial.available() > 0){
-          addr = Serial.read();  // legge il byte che indica il numero di pin del primo connettore
-          Serial.print("addr = ");
-          Serial.print(addr);
-          Serial.print("\n");
-        }
-        else{
-          Serial.print("no addr");
-          continue;  // se non c'è il byte ritorna in attesa di un comando sulla seriale
-        }
-        Serial.print("setAddres in output\n");
-        setOutputAddress(nPinConn1,nPinConn2,addr);
-      break;
-      case 1:
-        Serial.print("setAddres in input\n");
-      break;
-      
-      default:
-        Serial.print("operazione richiesta non consentita\n");
-        break;
-      }
-      Serial.print("Comando ricevuto\n");
-
-      // do i need to clear Serial buffer?
-     }
-     delay(100);
-  }
-  */
   int i=0;
+  //ATTENDI PER IL COMANDO
   while(!newData){
     if(Serial.available() > 0){
       byte1 = Serial.read();
-      //byte1=Serial.read(); do i need 2 bytes for this data?
-      //byte1=Serial.read();
       newData=true; 
       Serial.print("Comando ricevuto\n");
       // do i need to clear Serial buffer?
     }
     else{
-      delay(1000);
+      delay(500);
       if(i == 10){
         i=0;
         Serial.print("Nessuna operazione comandata\n");
@@ -118,14 +48,7 @@ void loop() {
       i++;
     }
   }
-  
   newData = false;
-  
-  
-  delay(1000);
-  //nPinConn1 = 40;
-  //nPinConn2 = 40;
-  
   bool boolMatrix[100][100];
   //boolMatrix = checkContinuity(nPinConn1, nPinConn2, tester);
 
@@ -139,31 +62,21 @@ void loop() {
   
   
   case 97:  // config per provarlo dalla seriale 97=a in ASCII
+    tester.setBusy();
     setConfig(tester);
     setSingleAddress(tester,0,false);
+    tester.testWire();
     delay(1000);
-    setSingleAddress(tester,1,false);
+    setSingleAddress(tester,0,true);
+    tester.testWire();
     delay(1000);
     setSingleAddress(tester,2,false);
-    delay(1000);
-    setSingleAddress(tester,3,false);
-    delay(1000);
-    setSingleAddress(tester,4,false);
-    delay(1000);
-    setSingleAddress(tester,5,false);
-    delay(1000);
-
-    setSingleAddress(tester,0,true);
-    delay(1000);
-    setSingleAddress(tester,1,true);
+    tester.testWire();
     delay(1000);
     setSingleAddress(tester,2,true);
-    delay(1000);
-    setSingleAddress(tester,3,true);
-    delay(1000);
-    setSingleAddress(tester,4,true);
-    delay(1000);
-    setSingleAddress(tester,5,true);
+    tester.testWire();
+    delay(2000);
+    tester.setFree();
     // IN TEORIA QUI DOVREI LEGGERE DUE BYTE E SCIVERE QUEI VALORI IN NPIN E IN EEPROM
     break;
 

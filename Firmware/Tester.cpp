@@ -10,7 +10,7 @@ Tester::Tester(){
   //int _nPinMUX = sizeof(_pinMUX);
   _nPinConn1 = 0;
   _nPinConn2 = 0;// questo valore andrebbe letto dalla EEPROM
-
+  _busy = false;
   // setto tutti i pin degli address in uscita
   for( int i=0; i<_nPinDEMUX; i++){     // set address pin of DEMUX in output
     pinMode(_pinDEMUX[i],OUTPUT);
@@ -18,7 +18,19 @@ Tester::Tester(){
   for( int i=0; i<_nPinMUX; i++){       // set address pin of MUX in output
     pinMode(_pinMUX[i],OUTPUT);
   }
+  pinMode(ledPin,OUTPUT);
+  pinMode(ledBusy,OUTPUT);
   // non c'è bisogno che setto il pin di lettura continuità come ingresso
+}
+
+void Tester::setBusy(){
+  _busy = true;
+  digitalWrite(ledBusy, true);
+}
+
+void Tester::setFree(){
+  _busy = true;
+  digitalWrite(ledBusy, false);
 }
 
 void Tester::setNPinConn1(int nPin){
@@ -30,7 +42,13 @@ void Tester::setNPinConn2(int nPin){
 
 bool Tester::testWire()
 {
-  return digitalRead(IN_SIGNAL);
+  bool isConnected = !bool(digitalRead(IN_SIGNAL));
+  if(isConnected){
+    digitalWrite(ledPin,HIGH);
+  }else{
+    digitalWrite(ledPin,LOW);
+  }
+  return isConnected;
 }
 
 void Tester::setDEMUX(int addr){   //READ HERE!!! here i can use DDRX and PORTX for assign port status immediatly or i can convert address in a sting that contain address in binary and compare single String index: String ad = String(addr,BIN), and then addr[i]=="0" or =="1"
