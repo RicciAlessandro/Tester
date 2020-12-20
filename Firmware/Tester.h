@@ -32,7 +32,7 @@ class Tester{
     Tester();                   //unique costructor
                                 //METHODS
     bool testWire();            //test the selected continuity from adrres demux pin to addres mux pin
-    void setDEMUX(int addr);   //set a determinate address for MUX/DEMUX
+    void setDEMUX(int addr);    //set a determinate address for MUX/DEMUX
     void setMUX(int addr);
     void setNPinConn1(int nPin);  // numero di pin del connettore 2
     void setNPinConn2(int nPin);  // numero di pin del connettore 2

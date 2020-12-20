@@ -8,7 +8,20 @@ version = 0.01
 BAUDRATE = 9600
 
 
-#definizione funzioni
+
+#definizione command
+def single_check():
+    ser.write([0b10010000])
+
+def total_check():
+    ser.write([0b11111111])
+
+def read_response():
+    a = ser.readline()
+    print(a)
+    #print(ser.read())
+    #aggiungere i controlli che non si stia leggendo quando la comunicazione è chiusa
+
 def send_address():
     '''
     print(type(listbox_address.curselection())) ---> tupla
@@ -46,12 +59,12 @@ def send_address():
     print(sended_bytes2)
     '''
 
-    
-    
 
+# GRAFICA
 def enable_commands():
     button_address["state"] = "normal"
-    button_check["state"] = "normal"
+    button_single_check["state"] = "normal"
+    button_total_check["state"] = "normal"
     combobox_address_1["state"] = "normal"
     combobox_address_2["state"] = "normal"
     label_address_1["state"] = "normal"
@@ -66,7 +79,8 @@ def enable_commands():
     
 def disable_commands():
     button_address["state"] = "disabled"
-    button_check["state"] = "disabled"
+    button_single_check["state"] = "disabled"
+    button_total_check["state"] = "disabled"
     combobox_address_1["state"] = "disabled"
     combobox_address_2["state"] = "disabled"
     label_address_1["state"] = "disabled"
@@ -80,20 +94,6 @@ def disable_commands():
     #combobox_conn["state"] = "disabled"
     
 
-
-
-#definizione command
-def send_check_request():
-    pass
-
-def check_continuity():
-    pass
-
-def read_response():
-    a = str(ser.read())
-    print(a)
-    #print(ser.read())
-    #aggiungere i controlli che non si stia leggendo quando la comunicazione è chiusa
 
 
 def combo_update():
@@ -262,12 +262,15 @@ row_index+=1
 
 #CONFIGURAZIONE PULSANTI INVIA COMANDI
 button_address = tk.Button(main_frame, text="SEND ADDRESS", command=send_address)
-button_check = tk.Button(main_frame, text="CHECK CONTINUITY", command=check_continuity)
+button_single_check = tk.Button(main_frame, text="CHECK CONTINUITY", command=single_check)
+button_total_check = tk.Button(main_frame, text="CHECK ALL", command=total_check)
 button_read = tk.Button(main_frame, text="READ RESPONSE", command=read_response)
 
 button_address.grid(row=row_index, column=0, sticky="WE")
 row_index+=1
-button_check.grid(row=row_index, column=0, sticky="WE")
+button_single_check.grid(row=row_index, column=0, sticky="WE")
+row_index+=1
+button_total_check.grid(row=row_index, column=0, sticky="WE")
 row_index+=1
 button_read.grid(row=row_index, column=0, sticky="WE")
 row_index+=1

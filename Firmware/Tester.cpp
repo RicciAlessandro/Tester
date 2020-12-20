@@ -40,10 +40,12 @@ void Tester::setNPinConn2(int nPin){
   _nPinConn2 = nPin;
 }
 
-bool Tester::testWire()
+bool Tester::testWire() // check continuity between pre setted pins and pilot ledPin to show the result
 {
-  bool isConnected = !bool(digitalRead(IN_SIGNAL));
-  if(isConnected){
+  bool isConnected = false;
+  int readedValue = digitalRead(IN_SIGNAL);
+  if(readedValue==LOW){
+    isConnected = true;
     digitalWrite(ledPin,HIGH);
   }else{
     digitalWrite(ledPin,LOW);
