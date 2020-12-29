@@ -1,0 +1,8 @@
+BUG 001
+    1) seleziona None nella listbox
+    2) seleziona un numero di pin nella combobox new_con_n_pin
+    ->
+    entra nella routine bindata con <<ListboxSelected>> anche se nessun comando
+    è associato alla combobox new_con_n_pin
+
+ComboboxSelected non è come la listbox che si attiva quando viene premuta la combobox, ma si attiva quando viene chiusa.
