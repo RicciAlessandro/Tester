@@ -4,5 +4,11 @@ BUG 001
     ->
     entra nella routine bindata con <<ListboxSelected>> anche se nessun comando
     è associato alla combobox new_con_n_pin
+        -> soluzione
+            ho dovito cambiare il selection mode della listbox, visto che 
+            ogni volta che un altro widget "rubabava" il focus dalla lista
+            questa lancia un ListboxSelect event
 
+BUG 002
 ComboboxSelected non è come la listbox che si attiva quando viene premuta la combobox, ma si attiva quando viene chiusa.
+    -> soluzione: Postcommand viene utilizzato quando premo sulla combobox
