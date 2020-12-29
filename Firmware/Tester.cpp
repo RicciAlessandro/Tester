@@ -18,6 +18,7 @@ Tester::Tester(){
   for( int i=0; i<_nPinMUX; i++){       // set address pin of MUX in output
     pinMode(_pinMUX[i],OUTPUT);
   }
+  pinMode(IN_SIGNAL,INPUT_PULLUP);
   pinMode(ledPin,OUTPUT);
   pinMode(ledBusy,OUTPUT);
   // non c'è bisogno che setto il pin di lettura continuità come ingresso

@@ -129,6 +129,7 @@ void loop() {
         setSingleAddress(tester, i, true);
         for(int j=0; j<nPinConn2; j++){
           setSingleAddress(tester, j, false);
+          delay(10);
           if(tester.testWire()==true){
             Serial.print("1 ");
           }
