@@ -4,13 +4,16 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as tks
 from connector import *
+from grid_matrix import *
 #import connector
       
-
 class Front_End():
     def __init__(self):
         self.main_frame = tk.Tk()
+        self.left_1_frame = tk.Frame(self.main_frame)
+        self.left_2_frame = tk.Frame(self.main_frame)
         self.connectors = []
+        self.continuity = {}
         self.selected_connector_1 = None
         self.selected_connector_2 = None # selected connector deve essere sempre coerent -> None nei casi di implausibilità (lista vuota, connettore eliminato, connettore1 = connettore2)
         self.ser = serial.Serial()       # istanzio un oggetto seriale senza aprire la comunicazione
@@ -22,64 +25,73 @@ class Front_End():
         #METODI PER LA CONFIGURAZIONE DELLA FINESTRA principale
         self.__init__main_frame()
         #CONFIGURAZIONE DELLA LABEL
-        self.label_ports = tk.Label(self.main_frame, text="Seriali disponibili")
+        self.label_ports = tk.Label(self.left_1_frame, text="Seriali disponibili")
         self.label_ports.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.row_index+=1
         #CONFIGURAZIONE DELLA COMBOBOX SERIALI DISPONIBILI
-        self.combobox_serial_port = ttk.Combobox(self.main_frame, values=self.ports, postcommand=self.combobox_serial_update)
+        self.combobox_serial_port = ttk.Combobox(self.left_1_frame, values=self.ports, postcommand=self.combobox_serial_update)
         self.combobox_serial_port.set("None")
         self.combobox_serial_port.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.row_index+=1
         #CONFIGURAZIONE DEI PULSANTI CONNETTI/DISCONNETTI SERIALE
-        self.button_connect = tk.Button(self.main_frame, text="CONNETTI", command=self.connect_to_HW)
+        self.button_connect = tk.Button(self.left_1_frame, text="CONNETTI", command=self.connect_to_HW)
         self.button_connect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
         self.row_index+=1
-        self.button_disconnect = tk.Button(self.main_frame, text="DISCONNETTI", command=self.disconnect_from_HW)
+        self.button_disconnect = tk.Button(self.left_1_frame, text="DISCONNETTI", command=self.disconnect_from_HW)
         self.button_disconnect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
         self.row_index+=1
         #LISTA CONNETTORI
-        self.label_conn_list = tk.Label(self.main_frame, text="Lista connettori:")
+        self.label_conn_list = tk.Label(self.left_1_frame, text="Lista connettori:")
         self.label_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.row_index+=1
-        self.listbox_conn_list = tk.Listbox(self.main_frame, selectmode = "SINGLE", exportselection=False)
+        self.listbox_conn_list = tk.Listbox(self.left_1_frame, selectmode = "SINGLE", exportselection=False)
         self.listbox_conn_list.insert(0,"None")
         self.listbox_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.listbox_conn_list.bind("<<ListboxSelect>>", self.on_conn1_selection) # se non metto la proprietà exportselection a False ogni volta che 
         self.row_index+=1
         #AGGIUNGI, ELIMINA CONNETTORE
-        self.button_add_conn = tk.Button(self.main_frame, text="ADD CONNECTOR", command=self.add_connector)
-        self.button_del_conn = tk.Button(self.main_frame, text="DEL CONNECTOR", command=self.del_connector)
+        self.button_add_conn = tk.Button(self.left_1_frame, text="ADD CONNECTOR", command=self.add_connector)
+        self.button_del_conn = tk.Button(self.left_1_frame, text="DEL CONNECTOR", command=self.del_connector)
         self.button_add_conn.grid(row=self.row_index, column=0, sticky="WE")
         self.row_index+=1
         self.button_del_conn.grid(row=self.row_index, column=0, sticky="WE")
         self.row_index+=1
         #COL2
         self.row_index = 0
-        self.col_index = 1
+        #self.col_index = 1
         #connettore1
-        self.label_conn = tk.Label(self.main_frame, text="Connettore selezionato:")
+        self.label_conn = tk.Label(self.left_2_frame, text="Connettore selezionato:")
         self.label_conn.grid(row=self.row_index, column=self.col_index, sticky="WE")
         self.row_index+=1
-        self.label_conn_name = tk.Label(self.main_frame, text="--")
+        self.label_conn_name = tk.Label(self.left_2_frame, text="--")
         self.label_conn_name.grid(row=self.row_index, column=self.col_index, sticky="WE")
         self.row_index+=1
-        self.label_n_pin_con_1 = tk.Label(self.main_frame, text="n pin conn: -- ")
+        self.label_n_pin_con_1 = tk.Label(self.left_2_frame, text="n pin conn: -- ")
         self.label_n_pin_con_1.grid(row=self.row_index, column=self.col_index, sticky="WE")
         self.row_index+=1
         #connettore2
-        self.label_conn_2 = tk.Label(self.main_frame, text="Connettore 2:")
+        self.label_conn_2 = tk.Label(self.left_2_frame, text="Connettore 2:")
         self.label_conn_2.grid(row=self.row_index, column=self.col_index, sticky="WE")
         self.row_index+=1
-        self.combobox_conn_2 = ttk.Combobox(self.main_frame, values=["None"], postcommand=self.combobox_conn_2_update)
+        self.combobox_conn_2 = ttk.Combobox(self.left_2_frame, values=["None"], postcommand=self.combobox_conn_2_update)
         self.combobox_conn_2.bind("<<ComboboxSelected>>",self.update_selected_connector_2)
         self.combobox_conn_2.set("None")
         self.combobox_conn_2.grid(row=self.row_index, column=self.col_index, padx=5, pady=1, sticky="WE")
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
+        self.grid_matrix_frame = tk.Frame(self.main_frame)
+        self.grid_matrix = GridMatrix(self.grid_matrix_frame)
+        self.row_index = 0
+        self.col_index += 1
+        self.left_1_frame.grid(row=0, column=0, sticky="n")
+        self.left_2_frame.grid(row=0, column=1, sticky="n")
+        self.grid_matrix_frame.grid(row=0, column=2, sticky="n")
+
     def __init__main_frame(self):
         self.main_frame.geometry("800x500")
         self.main_frame.title("Wiring Tester V"+ str(self.version))
         self.main_frame.resizable(height=False, width=False)
+
     def get_serial_ports(self):
         _port_list = serial.tools.list_ports.comports()
         _port_list_string = ["None"]
@@ -95,7 +107,7 @@ class Front_End():
         print("----update_selected_connectors----")
         self.update_selected_connector_1()
         self.update_selected_connector_2()
-    
+
     def update_selected_connector_1(self):
         '''
         1) read the conn1 listbox
@@ -158,6 +170,7 @@ class Front_End():
             1) if the name selected is present in the connector list update the selected connector label
             2) update the connector2 combobox with all the others connectors
         '''
+
         print("---- on_conn1_selection ----")
         self.update_selected_connector_1()
         self.update_selected_connector_2()
@@ -202,6 +215,7 @@ class Front_End():
         _int_input = int(self.combobox_n_pin_new.get())
         print(_int_input)
         _new_conn = Connector(_int_input,_text_input,1)
+        self.continuity[_new_conn.get_name()]=None
         self.connectors.append(_new_conn)
         self.listbox_conn_list.insert(0,_new_conn.get_name()) #volevo metterci END al posto di 0, ma non è definito
         #self.entry_name.destroy()
@@ -234,8 +248,14 @@ class Front_End():
             print("end del")
             return
         try:
+            print("a")
+            self.continuity[self.connectors[-_idx-1].get_name()]
+            print("a")
             del self.connectors[-_idx-1]  #nella listbox gli ultimi inseriti sono gli indici verso lo zero, nella lista invece gli ultimi appesi sono quelli verso END
+            print("a")
             self.listbox_conn_list.delete(_idx)
+            #self.listbox_conn_list.ac##(TODO tk.END)
+            self.update_selected_connector_1()
         except:
             print("errore: indice selezionato inesistente")
         print("end del")
@@ -291,8 +311,6 @@ class Front_End():
                 print("name: "+_name)
         #aggiorna la combobox con tutti i connettori tranne l'1 già selezionato
         self.combobox_conn_2["values"] = _conns
-
-
 
 #version = 0.01
 #BAUDRATE = 9600
