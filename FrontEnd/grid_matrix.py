@@ -1,11 +1,13 @@
 import tkinter as tk
+from connector import *
 '''
 qui il dubbio è:
     se io ora passo per riferimento la matrice di continuità, ed un'altra istanza la modifica, in automatico
     avrei le modifiche anche nell'attributo di questa classe, quindi dovrei richiamare solo il metodo render() indicando quali connettori devo visualizzare
 '''
 class GridMatrix():
-    def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name=" -- ", _conn_2_name=" --"):
+    def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name=" -- ", _conn_2_name=" --", _app=None):
+        self.app = _app
         self.main_frame = _main_frame
         self.frame = tk.Frame(self.main_frame)
         self.upper_frame = tk.Frame(self.main_frame)
@@ -36,7 +38,7 @@ class GridMatrix():
         _relief="solid"
         for _row in range(self.rows):
             if _row == self._n_pin_1:
-                _bg=None
+                _bg=self.frame.cget("bg")
                 _relief="sunken"
             self.labels_pin_index_1.append(tk.Label(self.frame, text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
             self.labels_pin_index_1[_row].grid(row=_row+1, column=0, sticky="nsew")
@@ -44,7 +46,7 @@ class GridMatrix():
         _relief="solid"
         for _col in range(self.cols):
             if _col == self._n_pin_2:
-                _bg=None
+                _bg=self.frame.cget("bg")
                 _relief="sunken"
             self.labels_pin_index_2.append(tk.Label(self.frame, text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
             self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
@@ -117,8 +119,8 @@ class GridMatrix():
                         self.labels_list[_row].append(tk.Label(self.frame,text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER))
                         self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
         self.frame.grid(row=1,column=1)
-        self.update_values(n_pin_1,n_pin_2,list(continuity.keys())[0],list(continuity.keys())[1],continuity)
-        self.render()
+        #self.update_values(n_pin_1,n_pin_2,list(continuity.keys())[0],list(continuity.keys())[1],continuity)
+        #self.render()
         '''
         #prova del metodo update
         self.continuity = continuity
@@ -150,7 +152,7 @@ class GridMatrix():
         _relief="solid"
         for _row in range(self.rows):
             if _row == self._n_pin_1:
-                _bg=None
+                _bg=self.frame.cget("bg")
                 _relief="sunken"
             self.labels_pin_index_1[_row].configure(text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
             #self.labels_pin_index_1[_row].grid(row=_row+1, column=0, sticky="nsew")
@@ -158,7 +160,7 @@ class GridMatrix():
         _relief="solid"
         for _col in range(self.cols):
             if _col == self._n_pin_2:
-                _bg=None
+                _bg=self.frame.cget("bg")
                 _relief="sunken"
             self.labels_pin_index_2[_col].configure(text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
             #self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
@@ -182,12 +184,12 @@ class GridMatrix():
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                             else:
                                 #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="gray")
                                 #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                     else:
                         for _col in range(self.cols):
                             print("col= "+str(_col))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="red")
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
             else:  #se esistorno i connettori ma non esiste la matrice di continuità
                 for _row in range(self.rows):
@@ -202,14 +204,15 @@ class GridMatrix():
                                 #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                             else:
                                 #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="yellow")
                                 #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                     else:
                         for _col in range(self.cols):
                             print("col= "+str(_col))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="pink")
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
         else: #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
+            print("OCCHIO CHE SONO ENTRATO IN UN FLUSSO STRANO: NON ESISTE IL DIZIONARIO DI CONTINUITA' O E' VUOTO MA ESISTONO GIA I CONNETTORI")
             for _row in range(self.rows):
                 print("row= "+str(_row))
                 #self.labels_list.append([])
@@ -221,12 +224,120 @@ class GridMatrix():
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                         else:
                             #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="black")
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                 else:
                     for _col in range(self.cols):
                         print("col= "+str(_col))
-                        self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER)
+                        self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="green")
+                        #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+        self.frame.grid(row=1,column=1)
+
+    def render_2(self):
+        '''
+        aggiorna la vista quando vengono cambiati i connettori selezionati
+        DEVO PRIMA CAMBIARE NPIN1,NPIN2, NOMI DEI CONNETTORI E MATRICE DI CONTINUITA' E POI POSSO CHIAMARE QUESTO METODO
+        '''
+        print("render 2")
+        #questo sarebbe l'update
+        if self.app.selected_connector_1:
+            _conn_1_name = self.app.selected_connector_1.get_name()
+            _n_pin_1 = self.app.selected_connector_1.get_n_pin()
+            print("ok")
+        else:
+            _conn_1_name = "--"
+            _n_pin_1 = 0
+        if self.app.selected_connector_2:
+            _conn_2_name = self.app.selected_connector_2.get_name()
+            _n_pin_2 = self.app.selected_connector_2.get_n_pin()
+            print("ok")
+        else:
+            _conn_2_name = "--"
+            _n_pin_2 = 0
+
+        self.label_conn_1_name.configure(text=_conn_1_name, wraplength=1, width=1)
+        self.label_conn_2_name.configure(text=_conn_2_name, height=1)
+        _bg="white"
+        _relief="solid"
+        for _row in range(self.rows):
+            if _row == _n_pin_1:
+                _bg=self.frame.cget("bg")
+                _relief="sunken"
+            self.labels_pin_index_1[_row].configure(text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
+            #self.labels_pin_index_1[_row].grid(row=_row+1, column=0, sticky="nsew")
+        _bg="white"
+        _relief="solid"
+        for _col in range(self.cols):
+            if _col == _n_pin_2:
+                _bg=self.frame.cget("bg")
+                _relief="sunken"
+            self.labels_pin_index_2[_col].configure(text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
+            #self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
+       
+        #se esiste la matrice di continuità
+        if self.app.continuity: #se il dizionario non è vuoto
+            if self.app.continuity[_conn_1_name][_conn_2_name]:    
+                for _row in range(self.rows):
+                    print("row= "+str(_row))
+                    #self.labels_list.append([])
+                    if _row < _n_pin_1:
+                        for _col in range(self.cols):
+                            print("col= "+str(_col))
+                            if _col < _n_pin_2:
+                                if self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]:    
+                                    #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
+                                    self.labels_list[_row][_col].configure(text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white")
+                                    #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                                else:
+                                    self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white")
+                                    #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                            else:
+                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
+                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                    else:
+                        for _col in range(self.cols):
+                            print("col= "+str(_col))
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+            else:  #se esistorno i connettori ma non esiste la matrice di continuità (lista dei valori)
+                for _row in range(self.rows):
+                    print("row= "+str(_row))
+                    #self.labels_list.append([])
+                    if _row < _n_pin_1:
+                        for _col in range(self.cols):
+                            print("col= "+str(_col))
+                            if _col < _n_pin_2:
+                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
+                                self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
+                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                            else:
+                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
+                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                    else:
+                        for _col in range(self.cols):
+                            print("col= "+str(_col))
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+        else: #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
+            for _row in range(self.rows):
+                print("row= "+str(_row))
+                #self.labels_list.append([])
+                if _row < _n_pin_1:
+                    for _col in range(self.cols):
+                        print("col= "+str(_col))
+                        if _col < _n_pin_2:
+                            self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
+                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                        else:
+                            #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
+                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                else:
+                    for _col in range(self.cols):
+                        print("col= "+str(_col))
+                        self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
                         #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
         self.frame.grid(row=1,column=1)
 
