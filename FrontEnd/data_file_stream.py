@@ -1,8 +1,9 @@
 import tkinter as tk
 from connector import *
 from contextlib import contextmanager
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import pandas as pd
+import math
 
 class DataFileStream():
     """
@@ -41,14 +42,72 @@ class SelectDir(tk.Button):
         self.data_file_stream = _data_file_stream 
 
     def on_press(self):
+
         self.data_file_stream.directory = filedialog.askdirectory(initialdir=".\FrontEnd\DB\Default")
-        print(self.data_file_stream.directory)
-        readed_data = pd.read_excel(self.data_file_stream.directory+'/config.xlsx')
-        print("readed_data")
-        print(readed_data)
+        if self.data_file_stream.directory:
+            print(self.data_file_stream.directory)
+            #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
+            try:
+                readed_data = pd.read_excel(self.data_file_stream.directory+'/config.xlsx')
+                print("readed_data")
+                print(readed_data)
+            except Exception as e:
+                messagebox.showerror("Error", e)
+                return
+            #print(type(readed_data["conn"]))
+            #print(readed_data["conn"])
+
+            _keys = []
+            for c in readed_data["conn"]:
+                print(type(c))
+                print(c)
+                if isinstance(c,float):
+                    if math.isnan(c):
+                        #print("nan intercettato")
+                        pass
+                else:
+                    _keys.append(c)
+            _values = []
+            #print(type(readed_data["n_pin"]))
+            #print(readed_data["n_pin"])
+            for c in readed_data["n_pin"]:
+                print(type(c))
+                print(c)
+                if isinstance(c,float):
+                    if math.isnan(c):
+                        #print("nan intercettato")
+                        pass
+                    else:
+                        #print("ok")
+                        _values.append(int(c))
+            #print(_keys)
+            #print(_values)
+            _n_pin_dict = dict(zip(_keys,_values))
+            print(_n_pin_dict)
+            #n_pin_dict = {"conn1":n_pin_1, "conn2":n_pin_2, "conn3":n_pin_3}
+
+            # todo controllo se continuity già esiste e richiesta a procedere
+
+            #AGGIUNGE I CONNETTORI.
+            self.data_file_stream.app.connectors = []
+            for _conn in list(_n_pin_dict.keys()):
+                _new_conn = Connector(_n_pin_dict[_conn],_conn,1)
+                self.data_file_stream.app.connectors.append(_new_conn)
+            self.data_file_stream.app.listbox_update()
+            
+            #costruisco il dizionario con le chiavi:
+            self.data_file_stream.app.continuity = {}
+            for _conn_1 in self.data_file_stream.app.connectors:
+                self.data_file_stream.app.continuity[_conn_1.get_name()] = {}
+                for _conn_2 in self.data_file_stream.app.connectors:
+                    if _conn_2.get_name() != _conn_1.get_name():
+                        self.data_file_stream.app.continuity[_conn_1.get_name()][_conn_2.get_name()]=[]
+            print("result")
+            print(self.data_file_stream.app.continuity)
+        
 class LoadButton(tk.Button):
     def __init__(self, _master, _data_file_stream):
-        super().__init__(_master,text="CARICA", command=self.on_press)
+        super().__init__(_master,text="APRI ...", command=self.on_press)
         self.data_file_stream = _data_file_stream
     
     def on_press(self):
@@ -78,7 +137,7 @@ perse. Sei sicuro di voler caricare i dati?")
 
             #print(self.data_file_stream.continuity)
             print(self.data_file_stream.app.continuity)
-            self.data_file_stream.app.connectors = []
+            self.data_file_stream.app.connectors = []  #CLEAR DELLA LISTA
             _conn_name = list(self.data_file_stream.app.continuity.keys())
             k=0
             for c in _conn_name:
