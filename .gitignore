@@ -1,6 +1,7 @@
 FrontEnd/__pycache__/connector.cpython-39.pyc
 FrontEnd/prove.py
 FrontEnd/DB/*.xlsx
+FrontEnd/DB/*
 FrontEnd/prove2.py
 FrontEnd/__pycache__/data_file_stream.cpython-39.pyc
 FrontEnd/__pycache__/grid_matrix.cpython-39.pyc
@@ -8,3 +9,5 @@ FrontEnd/DB/Default/config.xlsx
 FrontEnd/DB/Default/conn1.xlsx
 FrontEnd/DB/Default/conn2.xlsx
 FrontEnd/DB/Default/conn3.xlsx
+FrontEnd/DB/Prove/config.xlsx
+FrontEnd/DB/Prove/conn1.xlsx
