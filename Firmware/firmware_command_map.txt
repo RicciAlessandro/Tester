@@ -1,0 +1,8 @@
+
+byte1 = operazione da svolgere: [servirebbero 2 bit, posso risparmiarne 6]
+    0x00 test automatico
+    0x01 setta address in uscita
+    0x02 setta address in ingresso
+byte2 numero pin connettore 1 (0-255) [ne servirebbero al massimo 126, potrei risparmiare un bit con una maschera]
+byte3 numero pin connettore 2 (0-255) [ne servirebbero al massimo 126, potrei risparmiare un bit con una maschera]
+byte4 address da comandare (0-255)
