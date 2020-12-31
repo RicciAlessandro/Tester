@@ -6,7 +6,7 @@ qui il dubbio è:
     avrei le modifiche anche nell'attributo di questa classe, quindi dovrei richiamare solo il metodo render() indicando quali connettori devo visualizzare
 '''
 class GridMatrix():
-    def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name=" -- ", _conn_2_name=" --", _app=None):
+    def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
         self.app = _app
         self.main_frame = _main_frame
         self.frame = tk.Frame(self.main_frame)
@@ -274,8 +274,12 @@ class GridMatrix():
             self.labels_pin_index_2[_col].configure(text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
             #self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
        
-        #se esiste la matrice di continuità
-        if self.app.continuity: #se il dizionario non è vuoto
+        if _conn_1_name == "--" or _conn_2_name == "--":
+            for _row in range(self.rows):
+                for _col in range(self.cols):
+                    self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
+            #se esiste la matrice di continuità
+        elif self.app.continuity: #se il dizionario non è vuoto
             if self.app.continuity[_conn_1_name][_conn_2_name]:    
                 for _row in range(self.rows):
                     print("row= "+str(_row))
