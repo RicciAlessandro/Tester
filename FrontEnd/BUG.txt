@@ -12,3 +12,7 @@ BUG 001
 BUG 002
 ComboboxSelected non è come la listbox che si attiva quando viene premuta la combobox, ma si attiva quando viene chiusa.
     -> soluzione: Postcommand viene utilizzato quando premo sulla combobox
+
+
+IMPORTANTE
+nessun update del connettore selezionato dopo la cancellazione
