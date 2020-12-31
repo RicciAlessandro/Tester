@@ -5,6 +5,7 @@ from tkinter import ttk
 import tkinter.scrolledtext as tks
 from connector import *
 from grid_matrix import *
+from data_file_stream import *
 #import connector
       
 class Front_End():
@@ -12,6 +13,7 @@ class Front_End():
         self.main_frame = tk.Tk()
         self.left_1_frame = tk.Frame(self.main_frame)
         self.left_2_frame = tk.Frame(self.main_frame)
+        self.debug=True
         self.connectors = []
         self.continuity = {}
         self.selected_connector_1 = None
@@ -56,6 +58,9 @@ class Front_End():
         self.row_index+=1
         self.button_del_conn.grid(row=self.row_index, column=0, sticky="WE")
         self.row_index+=1
+        self.frame_IO = tk.Frame(self.left_1_frame)
+        self.data_file_stream = DataFileStream(self.frame_IO, self) # self.continuity
+        self.frame_IO.grid(row=self.row_index, column=0, sticky="WE")
         #COL2
         self.row_index = 0
         #self.col_index = 1
@@ -80,12 +85,29 @@ class Front_End():
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
         self.grid_matrix_frame = tk.Frame(self.main_frame)
-        self.grid_matrix = GridMatrix(self.grid_matrix_frame)
+        self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, " -- ", " --", self)
         self.row_index = 0
         self.col_index += 1
         self.left_1_frame.grid(row=0, column=0, sticky="n")
         self.left_2_frame.grid(row=0, column=1, sticky="n")
         self.grid_matrix_frame.grid(row=0, column=2, sticky="n")
+
+        if self.debug:
+            self.btn_print_cont = tk.Button(self.left_1_frame, text="print cont", command=self.print_cont)
+            self.btn_print_cont.grid()
+
+            self.btn_render = tk.Button(self.left_1_frame, text="render", command=self.grid_matrix.render_2)
+            self.btn_render.grid()
+        
+    def print_cont(self):
+        print(self.continuity)
+        print(self.connectors)
+        print(self.selected_connector_1)
+        print(self.selected_connector_2)
+        if self.selected_connector_1:
+            print(self.selected_connector_1.get_name())
+        if self.selected_connector_2:
+            print(self.selected_connector_2.get_name())
 
     def __init__main_frame(self):
         self.main_frame.geometry("800x500")
@@ -164,6 +186,7 @@ class Front_End():
         self.combobox_conn_2.set("None")
         #self.label_conn_name["text"] = "--"
         print("selected connector2 = None")
+
     def on_conn1_selection(self,eventObject):
         '''
         when an element of the connector listbox is selected:
@@ -174,7 +197,6 @@ class Front_End():
         print("---- on_conn1_selection ----")
         self.update_selected_connector_1()
         self.update_selected_connector_2()
-
 
     def add_connector(self):
         self.frame = tk.Toplevel(self.main_frame)
@@ -222,6 +244,19 @@ class Front_End():
         #self.combobox_n_pin_new.destroy()
         self.frame.destroy()
         #self.combobox_conn_2_update()
+    
+     #questa andrà aggiunta alla classe listbox
+    def listbox_clean(self):
+        self.listbox_conn_list.delete(0,tk.END)
+        self.listbox_conn_list.insert(0,"None")
+    
+    def listbox_update(self):
+        self.listbox_conn_list.delete(0,tk.END)
+        self.listbox_conn_list.insert(0,"None")
+        for _conn in self.connectors:
+            self.listbox_conn_list.insert(0,_conn.get_name())
+        
+    
     def cancel_btn_add_connector(self):
         '''
         when CANCEL btn is pressed:
