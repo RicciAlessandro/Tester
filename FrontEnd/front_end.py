@@ -85,7 +85,7 @@ class Front_End():
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
         self.grid_matrix_frame = tk.Frame(self.main_frame)
-        self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, " -- ", " --", self)
+        self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, "--", "--", self)
         self.row_index = 0
         self.col_index += 1
         self.left_1_frame.grid(row=0, column=0, sticky="n")
@@ -156,6 +156,7 @@ class Front_End():
         self.label_conn_name["text"] = "--"
         self.label_n_pin_con_1["text"] = "n pin conn: -- "
         print("selected connector1 = None")
+        self.grid_matrix.render_2()
 
     def update_selected_connector_2(self, eventObject=None):
         '''
@@ -172,6 +173,7 @@ class Front_End():
                     print("conn 2 != conn 1 (None) - OK")
                     print("selected connector2 = "+ _c_name)
                     self.selected_connector_2 = c
+                    self.grid_matrix.render_2()
                     return
                 elif _c_name == self.selected_connector_1.get_name():
                     print("connettore 2 selezionato uguale a connettore selezionato 1")
@@ -179,6 +181,7 @@ class Front_End():
                     print("conn 2 != conn 1 - OK")
                     print("selected connector2 = "+ _c_name)
                     self.selected_connector_2 = c
+                    self.grid_matrix.render_2()
                     return
             #else:
             #    print("selezionato connettore 2 None (nessun connettore nella lista connectors[] coincide con la combobox)")
@@ -186,6 +189,7 @@ class Front_End():
         self.combobox_conn_2.set("None")
         #self.label_conn_name["text"] = "--"
         print("selected connector2 = None")
+        self.grid_matrix.render_2()
 
     def on_conn1_selection(self,eventObject):
         '''
@@ -237,8 +241,16 @@ class Front_End():
         _int_input = int(self.combobox_n_pin_new.get())
         print(_int_input)
         _new_conn = Connector(_int_input,_text_input,1)
-        self.continuity[_new_conn.get_name()]=None
         self.connectors.append(_new_conn)
+        self.continuity[_new_conn.get_name()]={}
+        #aggiungi il nuovo connettore al dizionario dei connettori
+        for _conn in self.connectors:
+            if _conn.get_name() != _new_conn.get_name():
+                self.continuity[_new_conn.get_name()][_conn.get_name()]=[]
+        #aggiungi il dizionario che descrive il collegamento dei vecchi connettori al nuovo connettore
+        for _conn in self.connectors:
+            if _conn.get_name() != _new_conn.get_name():
+                self.continuity[_conn.get_name()][_new_conn.get_name()]=[]
         self.listbox_conn_list.insert(0,_new_conn.get_name()) #volevo metterci END al posto di 0, ma non è definito
         #self.entry_name.destroy()
         #self.combobox_n_pin_new.destroy()
@@ -284,18 +296,30 @@ class Front_End():
             return
         try:
             print("a")
-            self.continuity[self.connectors[-_idx-1].get_name()]
+            _conn_del_name = self.connectors[-_idx-1].get_name()
+            print("deleting")
+            print(_conn_del_name)
             print("a")
             del self.connectors[-_idx-1]  #nella listbox gli ultimi inseriti sono gli indici verso lo zero, nella lista invece gli ultimi appesi sono quelli verso END
             print("a")
+            del self.continuity[_conn_del_name]
+            print("a")
+            for _conn in self.connectors:
+                print(self.continuity)
+                del self.continuity[_conn.get_name()][_conn_del_name]        
+            print("a")
             self.listbox_conn_list.delete(_idx)
+            print("a")
             #self.listbox_conn_list.ac##(TODO tk.END)
             self.update_selected_connector_1()
+            print("ok")
         except:
             print("errore: indice selezionato inesistente")
         print("end del")
         for c in self.connectors:
             print(c.get_name())
+
+        
         
         #self.combobox_conn_2_update()
     def connect_to_HW(self):
