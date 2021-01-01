@@ -32,7 +32,19 @@ class SaveButton(tk.Button):
 
     def on_press(self):
         if self.data_file_stream.app.continuity:
-            pass
+            self.data_file_stream.directory = filedialog.askdirectory(initialdir=".\FrontEnd\DB\Default")
+            if self.data_file_stream.directory:
+                print(self.data_file_stream.directory)
+                #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
+                try:
+                    pass
+                except Exception as e:
+                    messagebox.showerror("Error", e)
+                    return
+                #print(type(readed_data["conn"]))
+                #print(readed_data["conn"])
+
+                _keys = []
         else:
             print("nessuna matrice di continuità da salvare")
 
@@ -104,6 +116,40 @@ class SelectDir(tk.Button):
                         self.data_file_stream.app.continuity[_conn_1.get_name()][_conn_2.get_name()]=[]
             print("result")
             print(self.data_file_stream.app.continuity)
+
+            #CARICA DATI DAI FILE:
+            print("POPOLA DIZIONARIO CONTINUITA'")
+            for _conn_1 in list(self.data_file_stream.app.continuity.keys()):
+                print(_conn_1)
+                #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
+                for _conn_2 in list(self.data_file_stream.app.continuity[_conn_1].keys()):
+                    if _conn_1 != _conn_2:
+                        _connection_matrix = []
+                        try:
+                            print("_conn_1")
+                            print(_conn_1)
+                            print("_conn_2")
+                            print(_conn_2)
+                            readed_data = pd.read_excel(self.data_file_stream.directory+'/'+_conn_1+'.xlsx',sheet_name=_conn_2)
+                            print("readed_data")
+                            print(readed_data)
+                            for _col in range(1,_n_pin_dict[_conn_2]+1,1):
+
+                                print("COL")
+                                print(_col)
+                                print(type(_col))
+                                print(readed_data[_col])
+                                _connection_matrix.append(readed_data[_col]) #_col-1
+
+                        except Exception as e:
+                            messagebox.showerror("Error", e)
+                            #return
+                        #print(type(readed_data["conn"]))
+                        #print(readed_data["conn"])
+                        _connection_matrix = list(map(list,zip(*_connection_matrix)))
+                        print(_connection_matrix)
+                        self.data_file_stream.app.continuity[_conn_1][_conn_2]=_connection_matrix
+        
         
 class LoadButton(tk.Button):
     def __init__(self, _master, _data_file_stream):
@@ -145,6 +191,9 @@ perse. Sei sicuro di voler caricare i dati?")
                 self.data_file_stream.app.connectors.append(_new_conn)
                 k+=1
             self.data_file_stream.app.listbox_update()
+            # lettura file creati
+
+
         
         
 
