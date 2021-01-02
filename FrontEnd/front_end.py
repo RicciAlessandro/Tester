@@ -100,15 +100,23 @@ class Front_End():
             self.btn_render.grid()
         
     def print_cont(self):
-        print(self.continuity)
-        print(self.connectors)
-        print(self.selected_connector_1)
-        print(self.selected_connector_2)
+        print("continuity 1: \n", self.continuity)
+        print("connectors: \n" , self.connectors)
+        _conn_name = []
+        for k in self.connectors:
+            _conn_name.append(k.get_name())
+        print("connectors name: \n" , _conn_name) 
+        print("selected connector 1: ", self.selected_connector_1)
+        print("selected connector 2: ", self.selected_connector_2)
         if self.selected_connector_1:
-            print(self.selected_connector_1.get_name())
+            print("selected connector 1 name: ", self.selected_connector_1.get_name())
+        else:
+            print("selected connector 1 name: --")
         if self.selected_connector_2:
-            print(self.selected_connector_2.get_name())
-
+            print("selected connector 2 name: ", self.selected_connector_2.get_name())
+        else:
+            print("selected connector 2 name: --")
+    
     def __init__main_frame(self):
         self.main_frame.geometry("800x500")
         self.main_frame.title("Wiring Tester V"+ str(self.version))
@@ -191,6 +199,9 @@ class Front_End():
         print("selected connector2 = None")
         self.grid_matrix.render_2()
 
+    
+    
+
     def on_conn1_selection(self,eventObject):
         '''
         when an element of the connector listbox is selected:
@@ -261,14 +272,23 @@ class Front_End():
     def listbox_clean(self):
         self.listbox_conn_list.delete(0,tk.END)
         self.listbox_conn_list.insert(0,"None")
-    
+        self.listbox_conn_list.activate(tk.END)
+
     def listbox_update(self):
         self.listbox_conn_list.delete(0,tk.END)
         self.listbox_conn_list.insert(0,"None")
         for _conn in self.connectors:
             self.listbox_conn_list.insert(0,_conn.get_name())
         
-    
+    def to_none_selected_connectors(self):
+        #self.selected_connector_1 = None
+        #self.selected_connector_2 = None
+        self.listbox_conn_list.select_set(tk.END)
+        #devo richiamare update seleted connector1?
+        self.combobox_conn_2.set("None")
+        # devo richiamare update selected connector2
+        self.update_selected_connectors()
+
     def cancel_btn_add_connector(self):
         '''
         when CANCEL btn is pressed:
@@ -308,10 +328,14 @@ class Front_End():
                 print(self.continuity)
                 del self.continuity[_conn.get_name()][_conn_del_name]        
             print("a")
-            self.listbox_conn_list.delete(_idx)
-            print("a")
-            #self.listbox_conn_list.ac##(TODO tk.END)
-            self.update_selected_connector_1()
+            ##qui forse posso mettere direttamente un update che mi ricostruisce tutta la lista
+            #self.listbox_conn_list.delete(_idx)
+            #print("a")
+            self.listbox_update()
+            self.to_none_selected_connectors()
+           
+            ##self.listbox_conn_list.ac##(TODO tk.END)
+            #self.update_selected_connector_1()
             print("ok")
         except:
             print("errore: indice selezionato inesistente")

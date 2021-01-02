@@ -160,12 +160,14 @@ class SelectDir(tk.Button):
 
             # todo controllo se continuity già esiste e richiesta a procedere
 
-            #AGGIUNGE I CONNETTORI.
+            #AGGIUNGE I CONNETTORI E AGGIORNA LA LISTBOX.
             self.data_file_stream.app.connectors = []
             for _conn in list(_n_pin_dict.keys()):
                 _new_conn = Connector(_n_pin_dict[_conn],_conn,1)
                 self.data_file_stream.app.connectors.append(_new_conn)
             self.data_file_stream.app.listbox_update()
+            #qui voglio attivare l'utlimo elemento della lista cioè none, e voglio che i connettori si settino a none e faccia il render della nuova situazione
+            self.data_file_stream.app.to_none_selected_connectors()
             
             #costruisco il dizionario con le chiavi:
             self.data_file_stream.app.continuity = {}
@@ -251,6 +253,7 @@ perse. Sei sicuro di voler caricare i dati?")
                 self.data_file_stream.app.connectors.append(_new_conn)
                 k+=1
             self.data_file_stream.app.listbox_update()
+            self.data_file_stream.app.none_selected_connectors()
             # lettura file creati
 
 
