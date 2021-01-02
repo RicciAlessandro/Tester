@@ -6,42 +6,48 @@ import tkinter.scrolledtext as tks
 from connector import *
 from grid_matrix import *
 from data_file_stream import *
+from serial_manager import *
 #import connector
       
 class Front_End():
     def __init__(self):
         self.main_frame = tk.Tk()
-        self.left_1_frame = tk.Frame(self.main_frame)
-        self.left_2_frame = tk.Frame(self.main_frame)
-        self.debug=True
+        self.left_1_frame = tk.Frame(self.main_frame, bg = "pink")
+        self.left_2_frame = tk.Frame(self.main_frame, bg = "green")
+        self.debug = True
         self.connectors = []
         self.continuity = {}
         self.selected_connector_1 = None
         self.selected_connector_2 = None # selected connector deve essere sempre coerent -> None nei casi di implausibilità (lista vuota, connettore eliminato, connettore1 = connettore2)
-        self.ser = serial.Serial()       # istanzio un oggetto seriale senza aprire la comunicazione
-        self.baudrate = 9600
+        #self.ser = serial.Serial()       # istanzio un oggetto seriale senza aprire la comunicazione
+        #self.baudrate = 9600
         self.version = 0.01
-        self.ports = self.get_serial_ports()  # controllo quali porte COM sono disponibili per poter aprire una comunicazione seriale
+        #self.ports = self.get_serial_ports()  # controllo quali porte COM sono disponibili per poter aprire una comunicazione seriale
         self.row_index = 0
         self.col_index = 0
         #METODI PER LA CONFIGURAZIONE DELLA FINESTRA principale
         self.__init__main_frame()
+        self.frame_serial_dash = tk.Frame(self.left_1_frame, bg = "black")
+        self.frame_serial_command = tk.Frame(self.main_frame, bg = "blue")
+        self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command)
+        self.frame_serial_dash.grid(row=0, column=0, padx=5, pady=1, sticky="WE")
+        self.row_index += 1
         #CONFIGURAZIONE DELLA LABEL
-        self.label_ports = tk.Label(self.left_1_frame, text="Seriali disponibili")
-        self.label_ports.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
-        self.row_index+=1
+        #self.label_ports = tk.Label(self.left_1_frame, text="Seriali disponibili")
+        #self.label_ports.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
+        #self.row_index+=1
         #CONFIGURAZIONE DELLA COMBOBOX SERIALI DISPONIBILI
-        self.combobox_serial_port = ttk.Combobox(self.left_1_frame, values=self.ports, postcommand=self.combobox_serial_update)
-        self.combobox_serial_port.set("None")
-        self.combobox_serial_port.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
-        self.row_index+=1
+        #self.combobox_serial_port = ttk.Combobox(self.left_1_frame, values=self.ports, postcommand=self.combobox_serial_update)
+        #self.combobox_serial_port.set("None")
+        #self.combobox_serial_port.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
+        #self.row_index+=1
         #CONFIGURAZIONE DEI PULSANTI CONNETTI/DISCONNETTI SERIALE
-        self.button_connect = tk.Button(self.left_1_frame, text="CONNETTI", command=self.connect_to_HW)
-        self.button_connect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
-        self.row_index+=1
-        self.button_disconnect = tk.Button(self.left_1_frame, text="DISCONNETTI", command=self.disconnect_from_HW)
-        self.button_disconnect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
-        self.row_index+=1
+        #self.button_connect = tk.Button(self.left_1_frame, text="CONNETTI", command=self.connect_to_HW)
+        #self.button_connect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
+        #self.row_index+=1
+        #self.button_disconnect = tk.Button(self.left_1_frame, text="DISCONNETTI", command=self.disconnect_from_HW)
+        #self.button_disconnect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
+        #self.row_index+=1
         #LISTA CONNETTORI
         self.label_conn_list = tk.Label(self.left_1_frame, text="Lista connettori:")
         self.label_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
@@ -122,12 +128,12 @@ class Front_End():
         self.main_frame.title("Wiring Tester V"+ str(self.version))
         self.main_frame.resizable(height=False, width=False)
 
-    def get_serial_ports(self):
-        _port_list = serial.tools.list_ports.comports()
-        _port_list_string = ["None"]
-        for i in _port_list:
-            _port_list_string.append(str(i.name))
-        return _port_list_string
+    #def get_serial_ports(self):
+    #    _port_list = serial.tools.list_ports.comports()
+    #    _port_list_string = ["None"]
+    #    for i in _port_list:
+    #        _port_list_string.append(str(i.name))
+    #    return _port_list_string
     
     def update_selected_connectors(self):
         '''
@@ -345,7 +351,7 @@ class Front_End():
 
         
         
-        #self.combobox_conn_2_update()
+    """ #self.combobox_conn_2_update()
     def connect_to_HW(self):
         _port = self.combobox_serial_port.get()
         print(_port)
@@ -378,6 +384,7 @@ class Front_End():
         print("COMBOBOX SERIAL postcommand entered")
         ports = self.get_serial_ports()
         self.combobox_serial_port["values"] = ports
+    """
     def combobox_conn_2_update(self, eventObject=None):
         print("----entered in combobox_conn_2_update()----")
         _conns = ["None"]
@@ -440,76 +447,6 @@ def send_address():
     print(sended_bytes1
     sended_bytes2 = ser.write(bytes([10]))
     print(sended_bytes2)
- 
-class popupWindows():
-    self.top = ##da vedereeee
-    self.l=Label(top,text="Hello World")
-    self.l.pack()
-
-def add_connector():
-    msg_box = tk.Tk()
-    upper_frame = tk.Frame(msg_box)
-    lower_frame = tk.Frame(msg_box)
-    upper_frame.grid(row=0, column=0, sticky="WE")
-    lower_frame.grid(row=1, column=0, sticky="WE")
-    ok_btn = tk.Button(lower_frame, text = "Ok", command=ok_btn_add_connector(msg_box))
-    ok_btn.grid(row=0,column=1, padx=5, pady=1, sticky="WE")
-   # ok_btn.bind("<<Button-1>>", ok_btn_add_connector(self, msg_box))
-    cancel_btn = tk.Button(lower_frame, text = "Cancel", command=cancel_btn_add_connector(msg_box))
-    #cancel_btn.bind("<<Button-1>>", cancel_btn_add_connector(self, msg_box))
-    cancel_btn.grid(row=0,column=0, padx=5, pady=1, sticky="WE")
-    entry_n_pin = tk.Entry(upper_frame, textvariable = "inserisci n_pin_conn")
-    entry_n_pin.grid(row=1, column=0, padx=5, pady=1, sticky="WE")
-    #crea nuovo connettore, lo appende alla lista di connettori e alla listobox
-    _new_conn = Connector(10,"ConnettoreProva",1)
-    connectors.append(_new_conn)
-    listbox_conn_list.insert(0,_new_conn.get_name()) #volevo metterci END al posto di 0, ma non è definito
-    combobox_conn_2_update()
-
-def ok_btn_add_connector(_master):
-    print("ok pressed")
-    #o = tk.Entry(_master)
-    #o.grid(row=2,column=2)
-    _master.destroy()
-
-def cancel_btn_add_connector(_master):
-    print("cancel pressed")
-    #_master.destroy()
-
-def del_connector():
-    print("start del")
-    try:
-        _idx = listbox_conn_list.curselection()[0]
-    except:
-        print("errore: elemento cancellato")
-        print("end del")
-        return
-    try:
-        del connectors[_idx]
-        listbox_conn_list.delete(_idx)
-    except:
-        print("errore: indice selezionato inesistente")
-    print("end del")
-    combobox_conn_2_update()
-
-
-def 1(eventObject):
-    print("listbox selected")
-    listbox_selected = listbox_conn_list.get(listbox_conn_list.curselection())#[0]
-    label_conn_name["text"] = listbox_selected
-    #trova il connettore selezionato nella lista dei connettori
-    if listbox_selected == "None":
-        label_n_pin_con_1["text"] = "n pin conn = -- "
-    else:
-        for _conn in connectors:
-            _name = _conn.get_name()
-            if _name == listbox_conn_list.get(listbox_conn_list.curselection()):
-                label_n_pin_con_1["text"] = "n pin conn: "+str(_conn.get_n_pin())
-                print("name: "+_name)
-            else:
-                print("connettore con nome diverso scartato")
-    combobox_conn_2_update()
-
 
 # GRAFICA
 def enable_commands():
@@ -543,14 +480,6 @@ def disable_commands():
     combobox_n_pin_conn_2["state"] = "disabled"
     button_read["state"] = "disabled"
     #combobox_conn["state"] = "disabled"
-    
-
-
-
-def combo_update():
-    print("postcommand entered")
-    ports = get_serial_ports()
-    combobox_serial_port["values"]=ports
 
 def combo_address_1_update(eventObject):
     print(eventObject)
@@ -573,18 +502,6 @@ def combobox_conn_2_update(_selected_name, _connectors):
             print("connettore selezionato non riportato nella combobox")
         else:
             _conns.append(_name)
-    combobox_conn_2["values"] = _conns
-'''
-'''
-def combobox_conn_2_update():
-    _conns = []
-    for _conn in connectors:
-        _name = _conn.get_name()
-        if _name == listbox_conn_list.get(listbox_conn_list.curselection()):
-            print("name: "+_name)
-        else:
-            _conns.append(_name)
-            print("name: "+_name)
     combobox_conn_2["values"] = _conns
 
 def combo_address_2_update(eventObject):
