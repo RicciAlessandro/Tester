@@ -1,3 +1,21 @@
 -add Serial input --> nPinConn1, nPinConn2
 -fix improvment and merge with main
 -fix schematics 
+
+
+- check sulla coerenza dei dati in input dal GUI
+- check coerenza dei database
+- modificare caricamento, selezionare configurazione e non cartella
+- aggiungere scollbar per la grid matrix
+- aggiungere il terminale
+- aggiungere la funzionalità che evidenzia i dati cambiati rispetto l'ultimo salvataggio
+- aggiungere le mesgbox che avvisino se si vogliono sovrascrivere i dati
+- aggiungere la funzionalità setta singolo step
+- aggiungere frame che indica tutte le info sui selected connectors
+
+HW:
+- portare i possibili pin a 127
+- mettere a massa i pin degli address che non sono utilizzati
+- utilizzare componenti smd senza la BOB
+- aggiungere i led busy e un secondo led ridondante per funzionalità future
+- predisporre un pullup esterno
