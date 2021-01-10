@@ -11,43 +11,29 @@ from serial_manager import *
       
 class Front_End():
     def __init__(self):
+        #METODI PER LA CONFIGURAZIONE DELLA FINESTRA principale
+        self.version = 0.01
         self.main_frame = tk.Tk()
+        self.__init__main_frame()
         self.left_1_frame = tk.Frame(self.main_frame, bg = "pink")
         self.left_2_frame = tk.Frame(self.main_frame, bg = "green")
+        self.frame_serial_dash = tk.Frame(self.left_1_frame, bg = "black")
+        self.frame_serial_command = tk.Frame(self.left_2_frame, bg = "blue")
+        self.frame_IO = tk.Frame(self.left_1_frame, bg="red", padx=1, pady=1)
         self.debug = True
         self.connectors = []
         self.continuity = {}
         self.selected_connector_1 = None
         self.selected_connector_2 = None # selected connector deve essere sempre coerent -> None nei casi di implausibilità (lista vuota, connettore eliminato, connettore1 = connettore2)
-        #self.ser = serial.Serial()       # istanzio un oggetto seriale senza aprire la comunicazione
-        #self.baudrate = 9600
-        self.version = 0.01
-        #self.ports = self.get_serial_ports()  # controllo quali porte COM sono disponibili per poter aprire una comunicazione seriale
+        
         self.row_index = 0
         self.col_index = 0
-        #METODI PER LA CONFIGURAZIONE DELLA FINESTRA principale
-        self.__init__main_frame()
-        self.frame_serial_dash = tk.Frame(self.left_1_frame, bg = "black")
-        self.frame_serial_command = tk.Frame(self.main_frame, bg = "blue")
-        self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command)
+        
+        self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command,self, self.connectors)
         self.frame_serial_dash.grid(row=0, column=0, padx=5, pady=1, sticky="WE")
+        self.frame_serial_command.grid(row=10, column=0, padx=5, pady=1, sticky="WE")
+        self.serial_manager.disable_commands()
         self.row_index += 1
-        #CONFIGURAZIONE DELLA LABEL
-        #self.label_ports = tk.Label(self.left_1_frame, text="Seriali disponibili")
-        #self.label_ports.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
-        #self.row_index+=1
-        #CONFIGURAZIONE DELLA COMBOBOX SERIALI DISPONIBILI
-        #self.combobox_serial_port = ttk.Combobox(self.left_1_frame, values=self.ports, postcommand=self.combobox_serial_update)
-        #self.combobox_serial_port.set("None")
-        #self.combobox_serial_port.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
-        #self.row_index+=1
-        #CONFIGURAZIONE DEI PULSANTI CONNETTI/DISCONNETTI SERIALE
-        #self.button_connect = tk.Button(self.left_1_frame, text="CONNETTI", command=self.connect_to_HW)
-        #self.button_connect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
-        #self.row_index+=1
-        #self.button_disconnect = tk.Button(self.left_1_frame, text="DISCONNETTI", command=self.disconnect_from_HW)
-        #self.button_disconnect.grid(row=self.row_index, column=0, sticky="WE", padx=5, pady=1)
-        #self.row_index+=1
         #LISTA CONNETTORI
         self.label_conn_list = tk.Label(self.left_1_frame, text="Lista connettori:")
         self.label_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
@@ -64,7 +50,6 @@ class Front_End():
         self.row_index+=1
         self.button_del_conn.grid(row=self.row_index, column=0, sticky="WE")
         self.row_index+=1
-        self.frame_IO = tk.Frame(self.left_1_frame)
         self.data_file_stream = DataFileStream(self.frame_IO, self) # self.continuity
         self.frame_IO.grid(row=self.row_index, column=0, sticky="WE")
         #COL2
@@ -127,13 +112,6 @@ class Front_End():
         self.main_frame.geometry("800x500")
         self.main_frame.title("Wiring Tester V"+ str(self.version))
         self.main_frame.resizable(height=False, width=False)
-
-    #def get_serial_ports(self):
-    #    _port_list = serial.tools.list_ports.comports()
-    #    _port_list_string = ["None"]
-    #    for i in _port_list:
-    #        _port_list_string.append(str(i.name))
-    #    return _port_list_string
     
     def update_selected_connectors(self):
         '''
@@ -264,10 +242,24 @@ class Front_End():
         for _conn in self.connectors:
             if _conn.get_name() != _new_conn.get_name():
                 self.continuity[_new_conn.get_name()][_conn.get_name()]=[]
+                #_connection_matrix = [[3]*_conn.get_n_pin()]*_new_conn.get_n_pin()
+                _connection_matrix = []
+                for i in range(_new_conn.get_n_pin()):
+                    _connection_matrix.append([])     
+                    for j in range(_conn.get_n_pin()):
+                        _connection_matrix[i].append(3)
+                self.continuity[_new_conn.get_name()][_conn.get_name()] = _connection_matrix
         #aggiungi il dizionario che descrive il collegamento dei vecchi connettori al nuovo connettore
         for _conn in self.connectors:
             if _conn.get_name() != _new_conn.get_name():
-                self.continuity[_conn.get_name()][_new_conn.get_name()]=[]
+                #_connection_matrix = [[3]*_new_conn.get_n_pin()]*_conn.get_n_pin() # NO! QUESTO CREA UNA LISTA E n RIFERIMENTI ALLA STESSA LISTA, UNA MODIFICA DI UN ELEMENTO SI RIPERQUOTE SU TUTTI GLI ALTRI
+                _connection_matrix = []
+                for i in range(_conn.get_n_pin()):
+                    _connection_matrix.append([])     
+                    for j in range(_new_conn.get_n_pin()):
+                        _connection_matrix[i].append(3)
+                self.continuity[_conn.get_name()][_new_conn.get_name()] = _connection_matrix
+                
         self.listbox_conn_list.insert(0,_new_conn.get_name()) #volevo metterci END al posto di 0, ma non è definito
         #self.entry_name.destroy()
         #self.combobox_n_pin_new.destroy()
@@ -410,76 +402,9 @@ class Front_End():
 def single_check():
     ser.write([0b10010000])
 
-def total_check():
-    ser.write([0b11111111])
-
-def read_response():
-    a = ser.readline()
-    print(a)
-    #print(ser.read())
-    #aggiungere i controlli che non si stia leggendo quando la comunicazione è chiusa
-
-def send_address():
-    print(type(listbox_address.curselection())) ---> tupla
-    print(type(listbox_address.curselection()[0])) ----> di interi
-
-    #_addr_int = listbox_address.curselection()[0]
-    _addr_int_1 = int(combobox_address_1.get())
-    _addr_int_2 = int(combobox_address_2.get())
-
-    #INVIA COMANDI
-    ser.write([97]) #manda comando prova
-    #sended_com_byte = ser.write([])
-    #_addr_byte = ser.write([_addr_int]) #in realtà la reference di serial.write() dice che non ci vanno le graffe, ma se non le metto e ci metto 6 ad esempio mi manda 6 byte vuoti.
-    _addr_byte_1 = ser.write([_addr_int_1])   #ECCERTO CHE MI INVIAVA UNA SERIE DI BYTE, è PERCHE NON è SERIAL.WRITE MA è PYSERIAL.WRITE CHE FUNZIONA DIVERSAMENTE
-    _addr_byte_2 = ser.write([_addr_int_2])
-    print("address 1 sended: "+str(_addr_int_1)+" in "+str(_addr_byte_1)+" byte")
-    print("address 2 sended: "+str(_addr_int_2)+" in "+str(_addr_byte_2)+" byte")
-    
-    #sended_bytes = ser.write([_addr_int])
-    #print("sended "+ str(sended_bytes) +" bytes")
-    #QUI CI VANNO LE GRAFFE!!!! ALTRIMENTI CREA UN VETTORE IMMUTABILE DI X BYTES
-    _addr_byte = bytes([_addr_int]) #bytes crea invece un vettore di byte di lunghezza pari all'argomento passato
-    print("address: "+str(_addr_byte))
-    sended_bytes = ser.write(_addr_byte)
-    print("sended "+ str(sended_bytes) +" bytes")
-     sended_bytes1 = ser.write(b'f60')
-    print(sended_bytes1
-    sended_bytes2 = ser.write(bytes([10]))
-    print(sended_bytes2)
 
 # GRAFICA
-def enable_commands():
-    button_address["state"] = "normal"
-    button_single_check["state"] = "normal"
-    button_total_check["state"] = "normal"
-    combobox_address_1["state"] = "normal"
-    combobox_address_2["state"] = "normal"
-    label_address_1["state"] = "normal"
-    label_address_2["state"] = "normal"
-    #label_conn["state"] = "normal"
-    #label_n_pin_con_1["state"] = "normal"
-    #label_n_pin_con_2["state"] = "normal"
-    combobox_n_pin_conn_1["state"] = "normal"
-    combobox_n_pin_conn_2["state"] = "normal"
-    button_read["state"] = "normal"
-    #combobox_conn["state"] = "normal"
-    
-def disable_commands():
-    button_address["state"] = "disabled"
-    button_single_check["state"] = "disabled"
-    button_total_check["state"] = "disabled"
-    combobox_address_1["state"] = "disabled"
-    combobox_address_2["state"] = "disabled"
-    label_address_1["state"] = "disabled"
-    label_address_2["state"] = "disabled"
-    #label_conn["state"] = "disabled"
-    #label_n_pin_con_1["state"] = "disabled"
-    #label_n_pin_con_2["state"] = "disabled"
-    combobox_n_pin_conn_1["state"] = "disabled"
-    combobox_n_pin_conn_2["state"] = "disabled"
-    button_read["state"] = "disabled"
-    #combobox_conn["state"] = "disabled"
+
 
 def combo_address_1_update(eventObject):
     print(eventObject)
@@ -492,73 +417,7 @@ def combo_address_1_update(eventObject):
         combobox_address_1.set("None")
         _pins = ["None"]
     combobox_address_1["values"]=_pins
-    '''
-'''
-def combobox_conn_2_update(_selected_name, _connectors):
-    _conns = []
-    for _conn in _connectors:
-        _name = _conn.get_name
-        if _name == _selected_name:
-            print("connettore selezionato non riportato nella combobox")
-        else:
-            _conns.append(_name)
-    combobox_conn_2["values"] = _conns
-
-def combo_address_2_update(eventObject):
-    print(eventObject)
-    print("binded funcion entered")
-    _readed_values = int(combobox_n_pin_conn_2.get())
-    if(_readed_values>0):
-        _pins = list(range(1,_readed_values+1,1))  #questi parametri quando vengono inseriti nella combobox diventano stringhe
-        #_pins.insert("None",0)
-    else:
-        print("Non sono disponibili pin per questo connettore\n")
-        combobox_address_2.set("None")
-        _pins = ["None"]
-    combobox_address_2["values"]=_pins
-
-def connect_to_HW():
-    _port = combobox_serial_port.get()
-    print(_port)
-    if _port == "None":
-        print("seleziona una porta seriale valida")
-    else:
-        #va inserito un blocco try except con la gestione degli errori.
-        if not(ser.is_open): # Establish the connection on a specific port
-            if _port in get_serial_ports():
-                print("connessione in corso")
-                ser.baudrate = BAUDRATE 
-                ser.port = _port
-                ser.timeout = 1
-                ser.open()
-                print("connessione aperta")
-                enable_commands()
-            else:
-                print("la porta è stata sconnessa, impossibile connettersi")
-        else:
-            print("comunicazione seriale già aperta")
-
-def disconnect_from_HW():
     
-    if ser.is_open:    # Establish the connection on a specific port
-        print("disconnessione in corso")
-        ser.close()
-        print("connessione chiusa")
-        disable_commands()
-    else:
-        print("nessuna comunicazione seriale aperta")
-
-
-#RITORNA UNA LISTA DI STRING CON LE PORTE DISPONIBILI
-def get_serial_ports():
-    _port_list = serial.tools.list_ports.comports()
-    _port_list_string = ["None"]
-    for i in _port_list:
-        _port_list_string.append(str(i.name))
-    return _port_list_string
-
-
-
 
 
 #--------------------------INIZIO CODICE SEQUENZIALE---------------------
