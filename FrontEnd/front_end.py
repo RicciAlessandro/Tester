@@ -199,6 +199,7 @@ class Front_End():
 
     def add_connector(self):
         self.frame = tk.Toplevel(self.main_frame)
+        self.frame.grab_set() #blocca la selezione su questo frame. @grab_release() or .withdraw()/.deiconify() per far comparire o scomparire
         self.upper_frame = tk.Frame(self.frame)
         self.lower_frame = tk.Frame(self.frame)
         self.upper_frame.grid(row=0, column=0, sticky="WE")
@@ -233,8 +234,29 @@ class Front_End():
         print("premuto ok")
         _text_input = (self.entry_name.get())
         print(_text_input)
-        _int_input = int(self.combobox_n_pin_new.get())
-        print(_int_input)
+        #controlli sull0input nome
+        if _text_input == "":
+            print("digita un nome valido")
+            return
+        if _text_input.isdigit():
+            print("il nome del connettore non può essere un numero")
+            return
+        for _conn in self.connectors:
+            if _text_input == _conn.get_name():
+                print("Nome connettore già esistente, digita un nome valido")
+                return
+        #controlli sull'input numerico
+        _raw_input = self.combobox_n_pin_new.get() #ritorna sempre una stringa
+        print(_raw_input)
+        if _raw_input.isdigit():
+            _int_input = int(self.combobox_n_pin_new.get())
+            if _int_input < 1: #alla fine questo controlla solo se è zero, perchè i numeri float o negativi se inseriti dall'entry ritornano falso in isdigit()
+                print("inserisci un numero di pin valido")
+                return
+        else:
+            print("inserisci un numero di pin valido (intero)")
+            return
+        #procedi a creare il nuovo connettore
         _new_conn = Connector(_int_input,_text_input,1)
         self.connectors.append(_new_conn)
         self.continuity[_new_conn.get_name()]={}
