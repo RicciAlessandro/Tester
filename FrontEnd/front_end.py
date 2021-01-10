@@ -200,8 +200,9 @@ class Front_End():
     def add_connector(self):
         self.frame = tk.Toplevel(self.main_frame)
         self.frame.grab_set() #blocca la selezione su questo frame. @grab_release() or .withdraw()/.deiconify() per far comparire o scomparire
-        self.upper_frame = tk.Frame(self.frame)
-        self.lower_frame = tk.Frame(self.frame)
+        self.frame.resizable(height=False, width=False)
+        self.upper_frame = tk.Frame(self.frame)  #, bg ="blue"
+        self.lower_frame = tk.Frame(self.frame)  #, bg = "red"
         self.upper_frame.grid(row=0, column=0, sticky="WE")
         self.lower_frame.grid(row=1, column=0, sticky="WE")
         #UPPER FRAME
@@ -216,11 +217,12 @@ class Front_End():
         self.combobox_n_pin_new.grid(row=1, column=1, padx=5, pady=1, sticky="WE")
         #LOWER FRAME
         self.ok_btn = tk.Button(self.lower_frame, text = "Ok", command=self.ok_btn_add_connector)
-        self.ok_btn.grid(row=0,column=1, padx=5, pady=1, sticky="WE")
+        self.ok_btn.pack(side="right", fill="x",expand=True, padx=1, pady=2)#sticky="WE"
         # ok_btn.bind("<<Button-1>>", ok_btn_add_connector(self, msg_box))
         self.cancel_btn = tk.Button(self.lower_frame, text = "Cancel", command=self.cancel_btn_add_connector)
         #cancel_btn.bind("<<Button-1>>", cancel_btn_add_connector(self, msg_box))
-        self.cancel_btn.grid(row=0,column=0, padx=5, pady=1, sticky="WE")
+        self.cancel_btn.pack(side="left", fill="x", expand=True, padx=1, pady=2)
+        #self.cancel_btn.grid(row=0,column=0, padx=5, pady=1, sticky='nesw')
     
     def ok_btn_add_connector(self):
         '''
