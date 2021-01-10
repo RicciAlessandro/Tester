@@ -63,9 +63,12 @@ class GridMatrix():
                         for _col in range(self.cols):
                             print("col= "+str(_col))
                             if _col < self._n_pin_2:
-                                if self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]:    
+                                if(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==1):    
                                     #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                     self.labels_list[_row].append(tk.Label(self.frame, text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white"))
+                                    self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                                elif(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==3):    
+                                    self.labels_list[_row].append(tk.Label(self.frame, text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white"))
                                     self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                                 else:
                                     self.labels_list[_row].append(tk.Label(self.frame, text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white"))
@@ -79,7 +82,7 @@ class GridMatrix():
                             print("col= "+str(_col))
                             self.labels_list[_row].append(tk.Label(self.frame,text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER))
                             self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-            else:
+            else: # IN QUESTO CASE NON CI CAPITERA' MAI VISTO CHE LA MATRICE DI CONTINUITA' ORMAI VIENE CREATA CON IL CONNETTORE
                 for _row in range(self.rows):
                     print("row= "+str(_row))
                     self.labels_list.append([])
@@ -99,7 +102,7 @@ class GridMatrix():
                             print("col= "+str(_col))
                             self.labels_list[_row].append(tk.Label(self.frame,text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER))
                             self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        else: #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
+        else: #ANCHE QUESTO NON VERRA' MAI IMPIEGATO PERCHè SIA IL DIZIONARIO CHE LA MATRICE DI CONTINUITA' VENGONO CREATE CON IL CONNETTORE #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
             for _row in range(self.rows):
                 print("row= "+str(_row))
                 self.labels_list.append([])
@@ -175,10 +178,12 @@ class GridMatrix():
                         for _col in range(self.cols):
                             print("col= "+str(_col))
                             if _col < self._n_pin_2:
-                                if self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]:    
+                                if(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==1):    
                                     #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                     self.labels_list[_row][_col].configure(text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                                elif(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==3):
+                                    self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                 else:
                                     self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
@@ -243,14 +248,14 @@ class GridMatrix():
         if self.app.selected_connector_1:
             _conn_1_name = self.app.selected_connector_1.get_name()
             _n_pin_1 = self.app.selected_connector_1.get_n_pin()
-            print("ok")
+            #print("ok")
         else:
             _conn_1_name = "--"
             _n_pin_1 = 0
         if self.app.selected_connector_2:
             _conn_2_name = self.app.selected_connector_2.get_name()
             _n_pin_2 = self.app.selected_connector_2.get_n_pin()
-            print("ok")
+            #print("ok")
         else:
             _conn_2_name = "--"
             _n_pin_2 = 0
@@ -282,16 +287,18 @@ class GridMatrix():
         elif self.app.continuity: #se il dizionario non è vuoto
             if self.app.continuity[_conn_1_name][_conn_2_name]:    
                 for _row in range(self.rows):
-                    print("row= "+str(_row))
+                    #print("row= "+str(_row))
                     #self.labels_list.append([])
                     if _row < _n_pin_1:
                         for _col in range(self.cols):
-                            print("col= "+str(_col))
+                            #print("col= "+str(_col))
                             if _col < _n_pin_2:
-                                if self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]:    
+                                if self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]==1:    
                                     #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                     self.labels_list[_row][_col].configure(text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
+                                elif self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]==3:
+                                    self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                 else:
                                     self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
@@ -301,16 +308,16 @@ class GridMatrix():
                                 #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                     else:
                         for _col in range(self.cols):
-                            print("col= "+str(_col))
+                            #print("col= "+str(_col))
                             self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
             else:  #se esistorno i connettori ma non esiste la matrice di continuità (lista dei valori)
                 for _row in range(self.rows):
-                    print("row= "+str(_row))
+                    #print("row= "+str(_row))
                     #self.labels_list.append([])
                     if _row < _n_pin_1:
                         for _col in range(self.cols):
-                            print("col= "+str(_col))
+                            #print("col= "+str(_col))
                             if _col < _n_pin_2:
                                 #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                 self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
@@ -321,16 +328,16 @@ class GridMatrix():
                                 #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                     else:
                         for _col in range(self.cols):
-                            print("col= "+str(_col))
+                            #print("col= "+str(_col))
                             self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
         else: #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
             for _row in range(self.rows):
-                print("row= "+str(_row))
+                #print("row= "+str(_row))
                 #self.labels_list.append([])
                 if _row < _n_pin_1:
                     for _col in range(self.cols):
-                        print("col= "+str(_col))
+                        #print("col= "+str(_col))
                         if _col < _n_pin_2:
                             self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
@@ -340,7 +347,7 @@ class GridMatrix():
                             #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                 else:
                     for _col in range(self.cols):
-                        print("col= "+str(_col))
+                        #print("col= "+str(_col))
                         self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
                         #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
         self.frame.grid(row=1,column=1)
