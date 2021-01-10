@@ -1,5 +1,5 @@
 import tkinter as tk
-from connector import *
+from connector import Connector
 from contextlib import contextmanager
 from tkinter import filedialog, messagebox
 import pandas as pd
@@ -34,15 +34,15 @@ class SaveButton(tk.Button):
 
     def on_press(self):
         if self.data_file_stream.app.continuity:
-            self.data_file_stream.directory = filedialog.askdirectory(initialdir=".\FrontEnd\DB\Default")
+            self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
             if self.data_file_stream.directory:
                 print(self.data_file_stream.directory)
                 #SALVA LA CONFIG
                 try:
 
                     print()
-                    _path = self.data_file_stream.directory+"\config.xlsx"
-                    writer = pd.ExcelWriter(_path, engine="openpyxl")
+                    _path = self.data_file_stream.directory+r"\config.xlsx"   #la r serve a dire che la stringa è row ed il carattere \ non da origine a caratteri speciali
+                    writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
                     _conns = []
                     _pins = []
                     for k,v in self.data_file_stream.app.continuity.items():
@@ -59,7 +59,7 @@ class SaveButton(tk.Button):
                     df = pd.DataFrame(_sheet_value)
                     df.to_excel(writer,index=False)
                     writer.save()
-                except:
+                except Exception as e:
                     print("save config failed")
                     messagebox.showerror("Error", e)
                     return
@@ -78,7 +78,7 @@ class SaveButton(tk.Button):
                         _sheet_value = {" ":_col_pin} #prima colonna del excel
                         print("key", k)
                         _path = self.data_file_stream.directory+"\\"+k+".xlsx"
-                        writer = pd.ExcelWriter(_path, engine="openpyxl")
+                        writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
                         for kk,vv in v.items(): 
                             print("key", kk)
                             for row in vv:
@@ -107,7 +107,7 @@ class SelectDir(tk.Button):
 
     def on_press(self):
 
-        self.data_file_stream.directory = filedialog.askdirectory(initialdir=".\FrontEnd\DB\Default")
+        self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
         if self.data_file_stream.directory:
             print(self.data_file_stream.directory)
             #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
