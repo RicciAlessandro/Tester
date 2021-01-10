@@ -32,9 +32,10 @@ void loop() {
   uint8_t nPinConn1;
   uint8_t nPinConn2;
   uint8_t addr;
-  bool boolMatrix[100][100];
+  //bool boolMatrix[100][100];
 
   Serial.print("attesa di un comando sulla SERIALE\n");
+  serialFlushBuffer();
   uint8_t k=0;
   //ATTENDI PER IL COMANDO
   while(!newData){
@@ -46,12 +47,12 @@ void loop() {
     }
     else{
       tester.setFree(); //spenge il led per far vedere che non è occupato
-      delay(500);
-      if(k == 10){
-        k=0;
-        Serial.print("Nessuna operazione comandata\n");
-      }
-      k++;
+      //delay(500);
+      //if(k == 10){
+        //k=0;
+        //Serial.print("Nessuna operazione comandata\n");
+      //}
+      //k++;
     }
   }
   tester.setBusy();
@@ -62,6 +63,7 @@ void loop() {
         // this costructor need to accept npin in parameter. Tester tester(nPinConn1,nPinConn2);
   switch (byte1) 
   {
+    /*
   case 0b10000000:  // config
     Serial.print("send config");
     nPinConn1 = Serial.read();
@@ -89,8 +91,8 @@ void loop() {
   case 0b10000010:  // sendSingleAddress
   {
     Serial.print("send single address");
-    // QUI DOVREI LEGGERE UN BYTE, VEDERE SE L'8AVO BIT è UNO E SE è UNO SETTO ADDRESS MUX ALTRIMENTI SETTO ADDRESS DEMUX
-    /* se && con maschera ==1 allora setta il mux con l'address altrimenti setta il demux*/
+    // QUI DOVREI LEGGERE UN BYTE, VEDERE SE L 8AVO BIT è UNO E SE è UNO SETTO ADDRESS MUX ALTRIMENTI SETTO ADDRESS DEMUX
+    /* se && con maschera ==1 allora setta il mux con l address altrimenti setta il demux*//*
     uint8_t _single_addr = Serial.read(); //indirizzo da settare
     uint8_t _conn = Serial.read();        //byte contente l'informazione relativa a quale dei due connettori si stà facendo oriferimento
     //SETTA MUX O DEMUX IN FUNZIONE DEI 2 BYTE RICEVUTI
@@ -114,32 +116,70 @@ void loop() {
     setSingleAddress(tester, _addr1, true);
     setSingleAddress(tester, _addr2, false);
     break;
-  }
+  }'''
   case 0b10010000:
     Serial.print("single check");
-    tester.testWire();
-    break;
+    setSingleAddress(tester, 0, true);
+    setSingleAddress(tester, 0, false);
+    bool _check = tester.testWire();
+    if(_check == true){
+      Serial.write(0b10010000);
+      Serial.write(0b00001111);
+    }
+    else{
+      Serial.write(0b10010000);
+      Serial.write(0b00000001);
+    }
+    
+    break;*/
   case 0b11111111:  // totalCheck
     {
       Serial.print("total check\n\n");
+      _delay_ms(10);
       //numero pin lo dovrebbe ricavare in automatico
-      nPinConn1 = 16;
-      nPinConn2 = 16;
+      //nPinConn1 = 3;
+      //nPinConn2 = 4;
+      while(true){
+        if(Serial.available() > 0){
+          nPinConn1 = Serial.read();
+          break;
+          // do i need to clear Serial buffer?
+        }
+      }
+      while(true){
+        if(Serial.available() > 0){
+          nPinConn2 = Serial.read();
+          break;
+          // do i need to clear Serial buffer?
+        }
+      }
       for(int i=0; i<nPinConn1; i++){
         setSingleAddress(tester, i, true);
         for(int j=0; j<nPinConn2; j++){
           setSingleAddress(tester, j, false);
-          delay(10);
+          _delay_ms(100);
           if(tester.testWire()==true){
-            Serial.print("1 ");
+            //Serial.print("1 ");
+            Serial.write(0b11111111);
+            Serial.write(0b00001111);
           }
           else{
-            Serial.print("0 ");
+            //Serial.print("0 ");
+            Serial.write(0b11111111);
+            Serial.write(0b00000001);
           }
           //boolMatrix[i][j] = tester.testWire();
         }
-        Serial.print("\n");
-      }/*
+        //Serial.print("\n");
+      }
+      Serial.print("nPin1\n");
+      Serial.print(nPinConn1);
+      Serial.print("\n");
+      Serial.print("nPin2\n");
+      Serial.print(nPinConn2);
+      Serial.print("\n");
+          
+      /*
       for(int i=0; i<nPinConn1; i++){
         for(int j=0; j<nPinConn2; j++){
           if(boolMatrix[i][j]==true){
@@ -179,4 +219,10 @@ void setSingleAddress(Tester _tester, int _addr, bool _MUXflag){
   else{
     _tester.setDEMUX(_addr);
   }
+}
+
+void serialFlushBuffer()
+{
+  while (Serial.read() >= 0)
+   ; // do nothing
 }
