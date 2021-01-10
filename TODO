@@ -1,9 +1,9 @@
--add Serial input --> nPinConn1, nPinConn2
--fix improvment and merge with main
--fix schematics 
+-add Serial input --> nPinConn1, nPinConn2  DONE
+-fix improvment and merge with main         DONE
+-fix schematics                             DONE
 
 
-- check sulla coerenza dei dati in input dal GUI
+- check sulla coerenza dei dati in input dalla GUI                                          DONE
 - check coerenza dei database
 - modificare caricamento, selezionare configurazione e non cartella
 - aggiungere scollbar per la grid matrix
@@ -15,7 +15,7 @@
 
 HW:
 - portare i possibili pin a 127
-- mettere a massa i pin degli address che non sono utilizzati
+- mettere a massa i pin degli address che non sono utilizzati                               DONE
 - utilizzare componenti smd senza la BOB
-- aggiungere i led busy e un secondo led ridondante per funzionalità future
+- aggiungere i led busy e un secondo led ridondante per funzionalità future                 DONE
 - predisporre un pullup esterno
