@@ -10,33 +10,46 @@ class GridMatrix():
     def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
         self.app = _app
         self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
+        self.main_frame_2 = tk.Frame(self.main_frame, bg = "blue", height=210, width=289 ) #scollable frame
         self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
         self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
-
-        self.main_frame_2 = tk.Frame(self.main_frame, bg = "blue", height=210, width=289 ) #scollable frame
         self.canvas = tk.Canvas(self.main_frame_2, bg = "green", yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=210, width=289)
+        self.canvas_1 = tk.Canvas(self.main_frame_2, bg = "purple", yscrollcommand=self.myscrollbar.set, height=210, width=20)
+        self.canvas_2 = tk.Canvas(self.main_frame_2, bg = "white", xscrollcommand=self.myscrollbar2.set, height=20, width=289)
         self.main_frame_2.grid_propagate(0)
         self.canvas.grid_propagate(0)
+        self.canvas_1.grid_propagate(0)
+        self.canvas_2.grid_propagate(0)
         #self.main_frame_2.configure(height=1000,width=500)
         #self.main_frame_2.configure(yscrollcommand=self.myscrollbar.set)
-        self.myscrollbar.config(command = self.canvas.yview)
-        self.myscrollbar2.config(command = self.canvas.xview)
+        self.myscrollbar.config(command = self.scroll_y)
+        self.myscrollbar2.config(command = self.scroll_x)
         self.frame = tk.Frame(self.canvas, bg = "pink")
+        self.frame_pin_1 = tk.Frame(self.canvas_1, bg = "white")
+        self.frame_pin_2 = tk.Frame(self.canvas_2, bg = "brown")
         self.upper_frame = tk.Frame(self.main_frame, bg = "red")
         self.left_frame = tk.Frame(self.main_frame, bg = "yellow")
-        self.myfunction(None)
+        #
         self.frame.bind("<Configure>",self.myfunction)
+        self.frame_pin_1.bind("<Configure>",self.myfunction_1)
+        self.frame_pin_2.bind("<Configure>",self.myfunction_2)
+        #self.btn_prova = tk.Button(self.frame_pin_2,text="ok")
+        #self.btn_prova.pack()
         self.canvas.create_window((0,0),window=self.frame,anchor='nw') #devo usare questo altrimenti se uso pack() per self.frame non funzionano le scroll
+        self.canvas_1.create_window((0,0),window=self.frame_pin_1,anchor='nw') #devo usare questo altrimenti se uso pack() per self.frame non funzionano le scroll
+        self.canvas_2.create_window((0,0),window=self.frame_pin_2,anchor='nw') #devo usare questo altrimenti se uso pack() per self.frame non funzionano le scroll
         #self.canvas.configure(yscrollcommand=self.myscrollbar.set)
-        
+
+        #self.myfunction(None)
         self.main_frame_2.grid(row=1,column=1)
         '''
         self.canvas.pack(side="left", fill="both", expand=True)
         self.myscrollbar.pack(side="left",fill="y")'''
         self.canvas.grid(row=1,column=1)
+        self.canvas_1.grid(row=1,column=0)
+        self.canvas_2.grid(row=0,column=1)
         self.myscrollbar.grid(row=1,column=2, sticky="ns")
         self.myscrollbar2.grid(row=2,column=1, sticky="we")
-
         
         #self.continuity = {}
         self.continuity = _continuity
@@ -66,7 +79,7 @@ class GridMatrix():
             if _row == self._n_pin_1:
                 _bg=self.frame.cget("bg")
                 _relief="sunken"
-            self.labels_pin_index_1.append(tk.Label(self.frame, text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
+            self.labels_pin_index_1.append(tk.Label(self.frame_pin_1, text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
             self.labels_pin_index_1[_row].grid(row=_row+1, column=0, sticky="nsew")
         _bg="white"
         _relief="solid"
@@ -74,7 +87,7 @@ class GridMatrix():
             if _col == self._n_pin_2:
                 _bg=self.frame.cget("bg")
                 _relief="sunken"
-            self.labels_pin_index_2.append(tk.Label(self.frame, text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
+            self.labels_pin_index_2.append(tk.Label(self.frame_pin_2, text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,))
             self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
         
         #riempimento label centro
@@ -162,9 +175,29 @@ class GridMatrix():
         self.render()
         print("rendered")
         '''
+
+
+    def scroll_x(self, *args):
+        print("scroll_x")
+        self.canvas.xview(*args)
+        self.canvas_1.xview(*args)
+        self.canvas_2.xview(*args)
+    
+    def scroll_y(self,*args):
+        print("scroll_y")
+        self.canvas.yview(*args)
+        self.canvas_1.yview(*args)
+        self.canvas_2.yview(*args)
+
     def myfunction(self, event):
         print("myfunction")
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))#,width=200,height=200)
+    def myfunction_1(self, event):
+            print("myfunction_1")
+            self.canvas_1.configure(scrollregion=self.canvas_1.bbox("all"))#,width=200,height=200)
+    def myfunction_2(self, event):
+            print("myfunction_2")
+            self.canvas_2.configure(scrollregion=self.canvas_2.bbox("all"))#,width=200,height=200)
 
     def update_values(self, _n_pin_1, _n_pin_2, _conn_1_name, _conn_2_name, _continuity = None):
         if _continuity:
