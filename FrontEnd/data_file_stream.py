@@ -115,7 +115,6 @@ class SelectDir(tk.Button):
             print(self.data_file_stream.directory)
             #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
             try:
-                ù
                 readed_data = pd.read_excel(self.data_file_stream.directory+'/config.xlsx')
                 print("readed_data")
                 print(readed_data)
