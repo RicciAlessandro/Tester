@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from tkinter import filedialog, messagebox
 import pandas as pd
 import math
+import os.path
 
 class DataFileStream():
     """
@@ -106,12 +107,15 @@ class SelectDir(tk.Button):
         self.data_file_stream = _data_file_stream 
 
     def on_press(self):
-
-        self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
+        #messagebox.showinfo("Seleziona Directory valida", "seleziona una cartella contenente un a configurazione valida (config.xlsx e relativi db connettori)")
+        #self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
+        self.data_file_stream.directory = filedialog.askopenfilename(initialdir=r".\FrontEnd\DB\Default", title="carica configurazione esistente", filetypes=[("xlsx config", "config*.xlsx")])
+        self.data_file_stream.directory = os.path.dirname(self.data_file_stream.directory)
         if self.data_file_stream.directory:
             print(self.data_file_stream.directory)
             #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
             try:
+                ù
                 readed_data = pd.read_excel(self.data_file_stream.directory+'/config.xlsx')
                 print("readed_data")
                 print(readed_data)
@@ -217,7 +221,7 @@ class LoadButton(tk.Button):
     def __init__(self, _master, _data_file_stream):
         super().__init__(_master,text="APRI config base", command=self.on_press)
         self.data_file_stream = _data_file_stream
-    
+        
     def on_press(self):
         #print(self.data_file_stream.continuity)
         #with self.data_file_stream.app as up:
