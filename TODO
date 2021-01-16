@@ -5,13 +5,13 @@
 
 - check sulla coerenza dei dati in input dalla GUI                                          DONE
 - check coerenza dei database
-- modificare caricamento, selezionare configurazione e non cartella
-- aggiungere scollbar per la grid matrix
+- modificare caricamento, selezionare configurazione e non cartella                         DONE
+- aggiungere scollbar per la grid matrix                                                    DONE
 - aggiungere il terminale
 - aggiungere la funzionalità che evidenzia i dati cambiati rispetto l'ultimo salvataggio
 - aggiungere le mesgbox che avvisino se si vogliono sovrascrivere i dati
 - aggiungere la funzionalità setta singolo step
-- aggiungere frame che indica tutte le info sui selected connectors
+- aggiungere frame che indica tutte le info sui selected connectors                         DONE
 
 HW:
 - portare i possibili pin a 127
