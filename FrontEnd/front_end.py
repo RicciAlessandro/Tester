@@ -15,11 +15,12 @@ class Front_End():
         self.version = 0.01
         self.main_frame = tk.Tk()
         self.__init__main_frame()
-        self.left_1_frame = tk.Frame(self.main_frame, bg = "pink")
-        self.left_2_frame = tk.Frame(self.main_frame, bg = "green")
-        self.frame_serial_dash = tk.Frame(self.left_1_frame, bg = "black")
+        self.left_1_frame = tk.Frame(self.main_frame)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
+        self.left_1_frame.grid_columnconfigure(0,weight=1)
+        self.left_2_frame = tk.Frame(self.main_frame)#, relief = "raised", borderwidth=1,padx=2,pady=1) # bg = "green")
+        self.frame_serial_dash = tk.Frame(self.left_1_frame, relief = "ridge", borderwidth = 4, padx = 2, pady = 1)# bg = "black")
         self.frame_serial_command = tk.Frame(self.left_2_frame, bg = "blue")
-        self.frame_IO = tk.Frame(self.left_1_frame, bg="red", padx=1, pady=1)
+        self.frame_IO = tk.Frame(self.left_1_frame, relief = "flat", borderwidth = 4, padx = 2, pady = 1) #, bg="red", relief = "raised", borderwidth=1,
         self.debug = True
         self.connectors = []
         self.continuity = {}
@@ -30,56 +31,62 @@ class Front_End():
         self.col_index = 0
         
         self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command,self, self.connectors)
-        self.frame_serial_dash.grid(row=0, column=0, padx=5, pady=1, sticky="WE")
-        self.frame_serial_command.grid(row=10, column=0, padx=5, pady=1, sticky="WE")
+        self.frame_serial_dash.grid(row=0, column=0, padx=0, pady=1) # sticky="we")
+        self.frame_serial_command.grid(row=10, column=0, padx=5, pady=1, sticky="we")
         self.serial_manager.disable_commands()
         self.row_index += 1
         #LISTA CONNETTORI
-        self.label_conn_list = tk.Label(self.left_1_frame, text="Lista connettori:")
+        self.list_frame = tk.Frame(self.left_1_frame, relief = "ridge", borderwidth = 4, padx = 2, pady = 2)
+        self.list_frame.grid_columnconfigure(0,weight=1)
+        self.list_frame.grid(sticky="we")
+        self.label_conn_list = tk.Label(self.list_frame, text="Lista connettori:")
         self.label_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.row_index+=1
-        self.listbox_conn_list = tk.Listbox(self.left_1_frame, selectmode = "SINGLE", exportselection=False)
+        self.listbox_conn_list = tk.Listbox(self.list_frame, selectmode = "SINGLE", exportselection=False)
         self.listbox_conn_list.insert(0,"None")
         self.listbox_conn_list.grid(row=self.row_index,column=0, padx=5, pady=1, sticky="WE")
         self.listbox_conn_list.bind("<<ListboxSelect>>", self.on_conn1_selection) # se non metto la proprietà exportselection a False ogni volta che 
         self.row_index+=1
         #AGGIUNGI, ELIMINA CONNETTORE
-        self.button_add_conn = tk.Button(self.left_1_frame, text="ADD CONNECTOR", command=self.add_connector)
-        self.button_del_conn = tk.Button(self.left_1_frame, text="DEL CONNECTOR", command=self.del_connector)
-        self.button_add_conn.grid(row=self.row_index, column=0, sticky="WE")
+        self.button_add_conn = tk.Button(self.list_frame, text="ADD CONNECTOR", command=self.add_connector)
+        self.button_del_conn = tk.Button(self.list_frame, text="DEL CONNECTOR", command=self.del_connector)
+        self.button_add_conn.grid(row=5, column=0, sticky="WE")
         self.row_index+=1
-        self.button_del_conn.grid(row=self.row_index, column=0, sticky="WE")
+        self.button_del_conn.grid(row=6, column=0, sticky="WE")
         self.row_index+=1
         self.data_file_stream = DataFileStream(self.frame_IO, self) # self.continuity
         self.frame_IO.grid(row=self.row_index, column=0, sticky="WE")
         #COL2
+        self.connectors_frame = tk.Frame(self.left_2_frame)
+        self.connector_table = ConnectorTable(self.connectors_frame, self)
+        self.connectors_frame.grid(row=10,column=0)
         self.row_index = 0
         #self.col_index = 1
         #connettore1
-        self.label_conn = tk.Label(self.left_2_frame, text="Connettore selezionato:")
-        self.label_conn.grid(row=self.row_index, column=self.col_index, sticky="WE")
-        self.row_index+=1
-        self.label_conn_name = tk.Label(self.left_2_frame, text="--")
-        self.label_conn_name.grid(row=self.row_index, column=self.col_index, sticky="WE")
-        self.row_index+=1
-        self.label_n_pin_con_1 = tk.Label(self.left_2_frame, text="n pin conn: -- ")
-        self.label_n_pin_con_1.grid(row=self.row_index, column=self.col_index, sticky="WE")
-        self.row_index+=1
+        #self.label_conn = tk.Label(self.left_2_frame, text="Connettore selezionato:")
+        #self.label_conn.grid(row=self.row_index, column=self.col_index, sticky="WE")
+        #self.row_index+=1
+        #self.label_conn_name = tk.Label(self.left_2_frame, text="--")
+        #self.label_conn_name.grid(row=self.row_index, column=self.col_index, sticky="WE")
+        #self.row_index+=1
+        #self.label_n_pin_con_1 = tk.Label(self.left_2_frame, text="n pin conn: -- ")
+        #self.label_n_pin_con_1.grid(row=self.row_index, column=self.col_index, sticky="WE")
+        #self.row_index+=1
         #connettore2
-        self.label_conn_2 = tk.Label(self.left_2_frame, text="Connettore 2:")
-        self.label_conn_2.grid(row=self.row_index, column=self.col_index, sticky="WE")
-        self.row_index+=1
-        self.combobox_conn_2 = ttk.Combobox(self.left_2_frame, values=["None"], postcommand=self.combobox_conn_2_update)
+        self.label_conn_2 = tk.Label(self.list_frame, text="Connettore 2:")
+        self.label_conn_2.grid(row=3, column=0, sticky="WE")
+        #self.row_index+=1
+        self.combobox_conn_2 = ttk.Combobox(self.list_frame, values=["None"], postcommand=self.combobox_conn_2_update)
         self.combobox_conn_2.bind("<<ComboboxSelected>>",self.update_selected_connector_2)
         self.combobox_conn_2.set("None")
-        self.combobox_conn_2.grid(row=self.row_index, column=self.col_index, padx=5, pady=1, sticky="WE")
+        self.combobox_conn_2.grid(row=4, column=0, padx=5, pady=1, sticky="WE")
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
-        self.grid_matrix_frame = tk.Frame(self.main_frame)
+        self.grid_matrix_frame = tk.Frame(self.main_frame, relief = "ridge", borderwidth=3)
         self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, "--", "--", self)
         self.row_index = 0
         self.col_index += 1
-        self.left_1_frame.grid(row=0, column=0, sticky="n")
+        self.left_1_frame.grid(row=0, column=0, sticky="nwe")
         self.left_2_frame.grid(row=0, column=1, sticky="n")
         self.grid_matrix_frame.grid(row=0, column=2, sticky="n")
 
@@ -91,6 +98,7 @@ class Front_End():
             self.btn_render.grid()
         
     def print_cont(self):
+        self.data_file_stream.app.connector_table.update()
         print("continuity 1: \n", self.continuity)
         print("connectors: \n" , self.connectors)
         _conn_name = []
@@ -135,19 +143,21 @@ class Front_End():
             if _c_name == _listbox_selected:
                 print("selected connector1 = "+ _c_name)
                 self.selected_connector_1 = c
-                self.label_conn_name["text"] = _c_name
-                self.label_n_pin_con_1["text"] = "n pin conn: "+str(c.get_n_pin())
+                #self.label_conn_name["text"] = _c_name
+                #self.label_n_pin_con_1["text"] = "n pin conn: "+str(c.get_n_pin())
                 if self.selected_connector_2 == self.selected_connector_1:
                     print("connettori selezionati uguali, connettore 2 viene settato a None")
                     self.selected_connector_2 == None
                     self.combobox_conn_2.set("None")
                     print("selected connector2 = None")
+                self.connector_table.update()
                 return
         self.selected_connector_1 = None
         self.listbox_conn_list.activate(tk.END)
-        self.label_conn_name["text"] = "--"
-        self.label_n_pin_con_1["text"] = "n pin conn: -- "
+        #self.label_conn_name["text"] = "--"
+        #self.label_n_pin_con_1["text"] = "n pin conn: -- "
         print("selected connector1 = None")
+        self.connector_table.update()
         self.grid_matrix.render_2()
 
     def update_selected_connector_2(self, eventObject=None):
@@ -166,6 +176,7 @@ class Front_End():
                     print("selected connector2 = "+ _c_name)
                     self.selected_connector_2 = c
                     self.grid_matrix.render_2()
+                    self.connector_table.update()
                     return
                 elif _c_name == self.selected_connector_1.get_name():
                     print("connettore 2 selezionato uguale a connettore selezionato 1")
@@ -174,6 +185,7 @@ class Front_End():
                     print("selected connector2 = "+ _c_name)
                     self.selected_connector_2 = c
                     self.grid_matrix.render_2()
+                    self.connector_table.update()
                     return
             #else:
             #    print("selezionato connettore 2 None (nessun connettore nella lista connectors[] coincide con la combobox)")
@@ -182,6 +194,7 @@ class Front_End():
         #self.label_conn_name["text"] = "--"
         print("selected connector2 = None")
         self.grid_matrix.render_2()
+        self.connector_table.update()
 
     
     
