@@ -1,5 +1,5 @@
 import tkinter as tk
-from connector import *
+from connector import Connector
 from tkinter import ttk
 '''
 qui il dubbio è:
@@ -8,15 +8,17 @@ qui il dubbio è:
 '''
 class GridMatrix():
     def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
+        self.scroll_height = 390
+        self.scroll_width = 310
         self.app = _app
         self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
-        self.main_frame_2 = tk.Frame(self.main_frame, height=210, width=289 ) #bg = "blue"
+        self.main_frame_2 = tk.Frame(self.main_frame, relief = "flat",borderwidth=1)#, height=self.scroll_height, width=self.scroll_width ) #bg = "blue"
         self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
         self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
-        self.canvas = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=210, width=289) #bg = "green",
-        self.canvas_1 = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, height=210, width=20) # bg = "purple",
-        self.canvas_2 = tk.Canvas(self.main_frame_2, xscrollcommand=self.myscrollbar2.set, height=20, width=289) # bg = "white",
-        self.main_frame_2.grid_propagate(0)
+        self.canvas = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=self.scroll_height, width=self.scroll_width, relief = "flat",borderwidth=2) #bg = "green",
+        self.canvas_1 = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, height=self.scroll_height, width=20, relief = "flat",borderwidth=2) # bg = "purple",
+        self.canvas_2 = tk.Canvas(self.main_frame_2, xscrollcommand=self.myscrollbar2.set, height=20, width=self.scroll_width, relief = "flat",borderwidth=2) # bg = "white",
+        #self.main_frame_2.grid_propagate(0)
         self.canvas.grid_propagate(0)
         self.canvas_1.grid_propagate(0)
         self.canvas_2.grid_propagate(0)
@@ -27,8 +29,8 @@ class GridMatrix():
         self.frame = tk.Frame(self.canvas) # , bg = "pink"
         self.frame_pin_1 = tk.Frame(self.canvas_1) # , bg = "white"
         self.frame_pin_2 = tk.Frame(self.canvas_2) #, bg = "brown"
-        self.upper_frame = tk.Frame(self.main_frame) # , bg = "red"
-        self.left_frame = tk.Frame(self.main_frame) #, bg = "yellow"
+        self.upper_frame = tk.Frame(self.main_frame, relief = "flat",borderwidth=2) # , bg = "red"
+        self.left_frame = tk.Frame(self.main_frame, relief = "flat",borderwidth=2) #, bg = "yellow"
         #
         self.frame.bind("<Configure>",self.myfunction)
         self.frame_pin_1.bind("<Configure>",self.myfunction_1)
@@ -57,18 +59,20 @@ class GridMatrix():
         self._n_pin_2 = _n_pin_2
         self.conn_1_name = _conn_1_name
         self.conn_2_name = _conn_2_name
-        self.rows = 20
-        self.cols = 30
-        self.label_conn_1 = tk.Label(self.left_frame, text="CONNETTORE 1", wraplength=1)
+        self.rows = 50
+        self.cols = 50
+        self.left_frame.grid_rowconfigure(0,weight=1) #OK questo serve veramente a dare alla riga il 100% dello spazio e farla espandere, solo con stiky non si espandeva
+        self.upper_frame.grid_columnconfigure(0,weight=1) #OK questo serve veramente a dare alla riga il 100% dello spazio e farla espandere, solo con stiky non si espandeva
+        self.label_conn_1 = tk.Label(self.left_frame, text="CONNETTORE 1", wraplength=1, anchor="center")#, bg="blue")
         self.label_conn_2 = tk.Label(self.upper_frame, text="CONNETTORE 2")
         self.label_conn_1_name = tk.Label(self.left_frame, text=self.conn_1_name, wraplength=1, width=1)
         self.label_conn_2_name = tk.Label(self.upper_frame, text=self.conn_2_name, height=1)
-        self.label_conn_2.grid(row=0,column=0)
-        self.label_conn_2_name.grid(row=1,column=0)
-        self.label_conn_1.grid(row=0,column=0)
-        self.label_conn_1_name.grid(row=0,column=1) 
-        self.left_frame.grid(row=1,column=0)
-        self.upper_frame.grid(row=0,column=1)
+        self.label_conn_2.grid(row=0,column=0, sticky = "we")
+        self.label_conn_2_name.grid(row=1,column=0, sticky = "we")
+        self.label_conn_1.grid(row=0,column=0, sticky = "ns")
+        self.label_conn_1_name.grid(row=0,column=1, sticky = "ns") 
+        self.left_frame.grid(row=1,column=0, sticky="ns")
+        self.upper_frame.grid(row=0,column=1, sticky="ew")
         #self.label_conn_1_name.grid(row=1,column=0)
         #self.label_conn_2_name.grid(row=0,column=1)
         self.labels_pin_index_1 = []

@@ -19,6 +19,10 @@ class SerialManager(object):
         self.timeout = 0.1
         self.wait_timeout = 5
         self.ports = self.get_serial_ports()
+
+        self.frame_1.grid_columnconfigure(0,weight=1)
+        self.frame_2.grid_columnconfigure(0,weight=1)
+        
         #LABEL
         self.label_ports = tk.Label(self.frame_1, text="Seriali disponibili")
         
