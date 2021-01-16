@@ -11,3 +11,4 @@ FrontEnd/__pycache__/grid_matrix.cpython-39.pyc
 FrontEnd/__pycache__/front_end.cpython-39.pyc
 .gitignore
 FrontEnd/front_end.spec
+prove3.py
