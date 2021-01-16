@@ -35,71 +35,85 @@ class SaveButton(tk.Button):
 
     def on_press(self):
         if self.data_file_stream.app.continuity:
-            self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
+            #self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
+            self.data_file_stream.file = filedialog.asksaveasfilename(
+                defaultextension='.xlsx', filetypes=[("xlsx files", '*.xlsx')],
+                initialdir=r".\FrontEnd\DB\Default",
+                title="Choose filename",
+                initialfile ="config")
+            print("writed file: "+(self.data_file_stream.file))
+            self.data_file_stream.directory = os.path.dirname(self.data_file_stream.file)
+            _file_name = os.path.split(self.data_file_stream.file)[1] #ritorna tupla di dir, file
+            print(_file_name)
             if self.data_file_stream.directory:
-                print(self.data_file_stream.directory)
-                #SALVA LA CONFIG
-                try:
-
-                    print()
-                    _path = self.data_file_stream.directory+r"\config.xlsx"   #la r serve a dire che la stringa è row ed il carattere \ non da origine a caratteri speciali
-                    writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
-                    _conns = []
-                    _pins = []
-                    for k,v in self.data_file_stream.app.continuity.items():
-                        #trova il numero di pin del connettore
-                        
-                        for _conn in self.data_file_stream.app.connectors:
-                            if _conn.get_name() == k:
-                                _conns.append(_conn.get_name())
-                                _pins.append(_conn.get_n_pin())
-                                #print("OOK", _conn.get_name())
-                                #print("pin", _n_pin)
-                        #_sheet_value = {" ":_col}
-                    _sheet_value = {"conn":_conns, "n_pin":_pins} #prima colonna del excel
-                    df = pd.DataFrame(_sheet_value)
-                    df.to_excel(writer,index=False)
-                    writer.save()
-                except Exception as e:
-                    print("save config failed")
-                    messagebox.showerror("Error", e)
-                    return
-
-                #SALVA I CONNETTORI NEI RELATIVI FILE
-                try:
-                    for k,v in self.data_file_stream.app.continuity.items():
-                        #trova il numero di pin del connettore
-                        for _conn in self.data_file_stream.app.connectors:
-                            if _conn.get_name() == k:
-                                _n_pin = _conn.get_n_pin()
-                                print("OOK", _conn.get_name())
-                                print("pin", _n_pin)
-                        _col_pin = list(range(1,_n_pin+1,1))
-                        #_sheet_value = {" ":_col}
-                        _sheet_value = {" ":_col_pin} #prima colonna del excel
-                        print("key", k)
-                        _path = self.data_file_stream.directory+"\\"+k+".xlsx"
+                if r"config" == _file_name[:6]:  #SE INIZIA PER CONFIG
+                    _suffix = _file_name[6:-5]   # tolgo config e .xlsx
+                    print("suffisso: "+ _suffix)
+                    #print(self.data_file_stream.directory)
+                    #SALVA LA CONFIG
+                    try:
+                        _path = self.data_file_stream.file#+r"\config.xlsx"   #la r serve a dire che la stringa è row ed il carattere \ non da origine a caratteri speciali
                         writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
-                        for kk,vv in v.items(): 
-                            print("key", kk)
-                            for row in vv:
-                                for pin1 in row:
-                                    print(pin1)
-                                print("\n")
-                            print("\n")
-                            vv_transp = list(map(list,zip(*vv)))
-                            j=1
-                            for _col in vv_transp:
-                                _sheet_value[j] = _col #colonne successive dell'excell
-                                j+=1
-                            df = pd.DataFrame(_sheet_value)
-                            df.to_excel(writer,sheet_name=kk,index=False)
+                        _conns = []
+                        _pins = []
+                        for k,v in self.data_file_stream.app.continuity.items():
+                            #trova il numero di pin del connettore
+                            
+                            for _conn in self.data_file_stream.app.connectors:
+                                if _conn.get_name() == k:
+                                    _conns.append(_conn.get_name())
+                                    _pins.append(_conn.get_n_pin())
+                                    #print("OOK", _conn.get_name())
+                                    #print("pin", _n_pin)
+                            #_sheet_value = {" ":_col}
+                        _sheet_value = {"conn":_conns, "n_pin":_pins} #prima colonna del excel
+                        df = pd.DataFrame(_sheet_value)
+                        df.to_excel(writer,index=False)
                         writer.save()
-                except Exception as e:
-                    messagebox.showerror("Error", e)
+                    except Exception as e:
+                        print("save config failed")
+                        messagebox.showerror("Error", e)
+                        return
+
+                    #SALVA I CONNETTORI NEI RELATIVI FILE
+                    try:
+                        for k,v in self.data_file_stream.app.continuity.items():
+                            #trova il numero di pin del connettore
+                            for _conn in self.data_file_stream.app.connectors:
+                                if _conn.get_name() == k:
+                                    _n_pin = _conn.get_n_pin()
+                                    print("OOK", _conn.get_name())
+                                    print("pin", _n_pin)
+                            _col_pin = list(range(1,_n_pin+1,1))
+                            #_sheet_value = {" ":_col}
+                            _sheet_value = {" ":_col_pin} #prima colonna del excel
+                            print("key", k)
+                            _path = self.data_file_stream.directory+"\\" + k +_suffix + ".xlsx"
+                            writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
+                            for kk,vv in v.items(): 
+                                print("key", kk)
+                                for row in vv:
+                                    for pin1 in row:
+                                        print(pin1)
+                                    print("\n")
+                                print("\n")
+                                vv_transp = list(map(list,zip(*vv)))
+                                j=1
+                                for _col in vv_transp:
+                                    _sheet_value[j] = _col #colonne successive dell'excell
+                                    j+=1
+                                df = pd.DataFrame(_sheet_value)
+                                df.to_excel(writer,sheet_name=kk,index=False)
+                            writer.save()
+                    except Exception as e:
+                        messagebox.showerror("Error", e)
+                        return
+                else:
+                    messagebox.showerror("Error!","Err_005: Il nome della configurazione deve obbligatoriamente iniziare con config.")
                     return
         else:
             print("nessuna matrice di continuità da salvare")
+            return
 
 class SelectDir(tk.Button):
     def __init__(self, _master, _data_file_stream):
@@ -109,13 +123,16 @@ class SelectDir(tk.Button):
     def on_press(self):
         #messagebox.showinfo("Seleziona Directory valida", "seleziona una cartella contenente un a configurazione valida (config.xlsx e relativi db connettori)")
         #self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
-        self.data_file_stream.directory = filedialog.askopenfilename(initialdir=r".\FrontEnd\DB\Default", title="carica configurazione esistente", filetypes=[("xlsx config", "config*.xlsx")])
-        self.data_file_stream.directory = os.path.dirname(self.data_file_stream.directory)
+        self.data_file_stream.file = filedialog.askopenfilename(initialdir=r".\FrontEnd\DB\Default", title="carica configurazione esistente", filetypes=[("xlsx config", "config*.xlsx")])
+        self.data_file_stream.directory = os.path.dirname(self.data_file_stream.file)
+        _file_name = os.path.split(self.data_file_stream.file)[1] #ritorna tupla di dir, file
+        print(_file_name)   #che inizia per forza con config
         if self.data_file_stream.directory:
-            print(self.data_file_stream.directory)
+            _suffix = _file_name[6:-5]   # tolgo config e .xlsx
+            print("readed file: " + self.data_file_stream.file + " suffix: " + _suffix)
             #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
             try:
-                readed_data = pd.read_excel(self.data_file_stream.directory+'/config.xlsx')
+                readed_data = pd.read_excel(self.data_file_stream.file)#self.data_file_stream.directory+'/config.xlsx')
                 print("readed_data")
                 print(readed_data)
             except Exception as e:
@@ -195,8 +212,8 @@ class SelectDir(tk.Button):
                             print(_conn_1)
                             print("_conn_2")
                             print(_conn_2)
-                            readed_data = pd.read_excel(self.data_file_stream.directory+'/'+_conn_1+'.xlsx',sheet_name=_conn_2)
-                            print("readed_data")
+                            readed_data = pd.read_excel(self.data_file_stream.directory + '/' + _conn_1 + _suffix +'.xlsx',sheet_name=_conn_2)
+                            print("readed_data") 
                             print(readed_data)
                             for _col in range(1,_n_pin_dict[_conn_2]+1,1):
 

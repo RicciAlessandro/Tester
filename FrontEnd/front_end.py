@@ -20,8 +20,8 @@ class Front_End():
         self.layer_top.grid_rowconfigure(0,weight=2)
         self.layer_low.grid_columnconfigure(0,weight=1)
         self.layer_low.grid_rowconfigure(0,weight=1)
-        self.layer_top.grid(row=0,column=0)
-        self.layer_low.grid(row=1,column=0)
+        self.layer_top.grid(row=0,column=0,sticky="nswe")
+        self.layer_low.grid(row=1,column=0,sticky="nswe")
         
         self.left_1_frame = tk.Frame(self.layer_top)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
         self.left_1_frame.grid_columnconfigure(0,weight=1)

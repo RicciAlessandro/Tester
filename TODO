@@ -9,9 +9,10 @@
 - aggiungere scollbar per la grid matrix                                                    DONE
 - aggiungere il terminale
 - aggiungere la funzionalità che evidenzia i dati cambiati rispetto l'ultimo salvataggio
-- aggiungere le mesgbox che avvisino se si vogliono sovrascrivere i dati
+- aggiungere le mesgbox che avvisino se si vogliono sovrascrivere i dati                    DONE
 - aggiungere la funzionalità setta singolo step
 - aggiungere frame che indica tutte le info sui selected connectors                         DONE
+- cambiare config con config_ (occhio che deve ricalcolare i suffissi)
 
 HW:
 - portare i possibili pin a 127
