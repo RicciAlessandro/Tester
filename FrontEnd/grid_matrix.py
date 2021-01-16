@@ -10,12 +10,12 @@ class GridMatrix():
     def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
         self.app = _app
         self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
-        self.main_frame_2 = tk.Frame(self.main_frame, bg = "blue", height=210, width=289 ) #scollable frame
+        self.main_frame_2 = tk.Frame(self.main_frame, height=210, width=289 ) #bg = "blue"
         self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
         self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
-        self.canvas = tk.Canvas(self.main_frame_2, bg = "green", yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=210, width=289)
-        self.canvas_1 = tk.Canvas(self.main_frame_2, bg = "purple", yscrollcommand=self.myscrollbar.set, height=210, width=20)
-        self.canvas_2 = tk.Canvas(self.main_frame_2, bg = "white", xscrollcommand=self.myscrollbar2.set, height=20, width=289)
+        self.canvas = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=210, width=289) #bg = "green",
+        self.canvas_1 = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, height=210, width=20) # bg = "purple",
+        self.canvas_2 = tk.Canvas(self.main_frame_2, xscrollcommand=self.myscrollbar2.set, height=20, width=289) # bg = "white",
         self.main_frame_2.grid_propagate(0)
         self.canvas.grid_propagate(0)
         self.canvas_1.grid_propagate(0)
@@ -24,11 +24,11 @@ class GridMatrix():
         #self.main_frame_2.configure(yscrollcommand=self.myscrollbar.set)
         self.myscrollbar.config(command = self.scroll_y)
         self.myscrollbar2.config(command = self.scroll_x)
-        self.frame = tk.Frame(self.canvas, bg = "pink")
-        self.frame_pin_1 = tk.Frame(self.canvas_1, bg = "white")
-        self.frame_pin_2 = tk.Frame(self.canvas_2, bg = "brown")
-        self.upper_frame = tk.Frame(self.main_frame, bg = "red")
-        self.left_frame = tk.Frame(self.main_frame, bg = "yellow")
+        self.frame = tk.Frame(self.canvas) # , bg = "pink"
+        self.frame_pin_1 = tk.Frame(self.canvas_1) # , bg = "white"
+        self.frame_pin_2 = tk.Frame(self.canvas_2) #, bg = "brown"
+        self.upper_frame = tk.Frame(self.main_frame) # , bg = "red"
+        self.left_frame = tk.Frame(self.main_frame) #, bg = "yellow"
         #
         self.frame.bind("<Configure>",self.myfunction)
         self.frame_pin_1.bind("<Configure>",self.myfunction_1)
