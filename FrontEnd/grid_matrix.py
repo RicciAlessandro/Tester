@@ -1,5 +1,6 @@
 import tkinter as tk
 from connector import *
+from tkinter import ttk
 '''
 qui il dubbio è:
     se io ora passo per riferimento la matrice di continuità, ed un'altra istanza la modifica, in automatico
@@ -8,18 +9,43 @@ qui il dubbio è:
 class GridMatrix():
     def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
         self.app = _app
-        self.main_frame = _main_frame
-        self.frame = tk.Frame(self.main_frame)
-        self.upper_frame = tk.Frame(self.main_frame)
-        self.left_frame = tk.Frame(self.main_frame)
+        self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
+        self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
+        self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
+
+        self.main_frame_2 = tk.Frame(self.main_frame, bg = "blue", height=210, width=289 ) #scollable frame
+        self.canvas = tk.Canvas(self.main_frame_2, bg = "green", yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=210, width=289)
+        self.main_frame_2.grid_propagate(0)
+        self.canvas.grid_propagate(0)
+        #self.main_frame_2.configure(height=1000,width=500)
+        #self.main_frame_2.configure(yscrollcommand=self.myscrollbar.set)
+        self.myscrollbar.config(command = self.canvas.yview)
+        self.myscrollbar2.config(command = self.canvas.xview)
+        self.frame = tk.Frame(self.canvas, bg = "pink")
+        self.upper_frame = tk.Frame(self.main_frame, bg = "red")
+        self.left_frame = tk.Frame(self.main_frame, bg = "yellow")
+        self.myfunction(None)
+        self.frame.bind("<Configure>",self.myfunction)
+        self.canvas.create_window((0,0),window=self.frame,anchor='nw') #devo usare questo altrimenti se uso pack() per self.frame non funzionano le scroll
+        #self.canvas.configure(yscrollcommand=self.myscrollbar.set)
+        
+        self.main_frame_2.grid(row=1,column=1)
+        '''
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.myscrollbar.pack(side="left",fill="y")'''
+        self.canvas.grid(row=1,column=1)
+        self.myscrollbar.grid(row=1,column=2, sticky="ns")
+        self.myscrollbar2.grid(row=2,column=1, sticky="we")
+
+        
         #self.continuity = {}
         self.continuity = _continuity
         self._n_pin_1 = _n_pin_1
         self._n_pin_2 = _n_pin_2
         self.conn_1_name = _conn_1_name
         self.conn_2_name = _conn_2_name
-        self.rows = 10
-        self.cols = 15
+        self.rows = 20
+        self.cols = 30
         self.label_conn_1 = tk.Label(self.left_frame, text="CONNETTORE 1", wraplength=1)
         self.label_conn_2 = tk.Label(self.upper_frame, text="CONNETTORE 2")
         self.label_conn_1_name = tk.Label(self.left_frame, text=self.conn_1_name, wraplength=1, width=1)
@@ -121,7 +147,8 @@ class GridMatrix():
                         print("col= "+str(_col))
                         self.labels_list[_row].append(tk.Label(self.frame,text= " ", borderwidth=1, relief="sunken", width=2, height=1, anchor=tk.CENTER))
                         self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        self.frame.grid(row=1,column=1)
+        #self.frame.grid(row=1,column=1)
+        self.myfunction(None)
         #self.update_values(n_pin_1,n_pin_2,list(continuity.keys())[0],list(continuity.keys())[1],continuity)
         #self.render()
         '''
@@ -135,6 +162,9 @@ class GridMatrix():
         self.render()
         print("rendered")
         '''
+    def myfunction(self, event):
+        print("myfunction")
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))#,width=200,height=200)
 
     def update_values(self, _n_pin_1, _n_pin_2, _conn_1_name, _conn_2_name, _continuity = None):
         if _continuity:
@@ -236,7 +266,8 @@ class GridMatrix():
                         print("col= "+str(_col))
                         self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="green")
                         #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        self.frame.grid(row=1,column=1)
+        #self.frame.grid(row=1,column=1)
+        self.myfunction(None)
 
     def render_2(self):
         '''
@@ -350,11 +381,12 @@ class GridMatrix():
                         #print("col= "+str(_col))
                         self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
                         #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        self.frame.grid(row=1,column=1)
+        #self.frame.grid(row=1,column=1)
+        self.myfunction(None)
 
 if __name__ == "__main__":
     main_frame = tk.Tk()
-    
+    #main_frame.geometry("100x100")
     n_pin_1 = 2
     n_pin_2 = 3
     n_pin_3 = 4
