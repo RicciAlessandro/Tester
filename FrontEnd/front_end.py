@@ -1,4 +1,3 @@
-import serial
 import serial.tools.list_ports
 import tkinter as tk
 from tkinter import ttk
@@ -15,9 +14,18 @@ class Front_End():
         self.version = 0.01
         self.main_frame = tk.Tk()
         self.__init__main_frame()
-        self.left_1_frame = tk.Frame(self.main_frame)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
+        self.layer_top = tk.Frame(self.main_frame, relief="groove", borderwidth=2, padx=2, pady=2)
+        self.layer_low = tk.Frame(self.main_frame, relief="groove", borderwidth=2)
+        self.layer_top.grid_columnconfigure(0,weight=1)
+        self.layer_top.grid_rowconfigure(0,weight=2)
+        self.layer_low.grid_columnconfigure(0,weight=1)
+        self.layer_low.grid_rowconfigure(0,weight=1)
+        self.layer_top.grid(row=0,column=0)
+        self.layer_low.grid(row=1,column=0)
+        
+        self.left_1_frame = tk.Frame(self.layer_top)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
         self.left_1_frame.grid_columnconfigure(0,weight=1)
-        self.left_2_frame = tk.Frame(self.main_frame)#, relief = "raised", borderwidth=1,padx=2,pady=1) # bg = "green")
+        self.left_2_frame = tk.Frame(self.layer_top)#, relief = "raised", borderwidth=1,padx=2,pady=1) # bg = "green")
         self.frame_serial_dash = tk.Frame(self.left_1_frame, relief = "ridge", borderwidth = 4, padx = 2, pady = 1)# bg = "black")
         self.frame_serial_command = tk.Frame(self.left_2_frame, bg = "blue")
         self.frame_IO = tk.Frame(self.left_1_frame, relief = "flat", borderwidth = 4, padx = 2, pady = 1) #, bg="red", relief = "raised", borderwidth=1,
@@ -82,7 +90,7 @@ class Front_End():
         self.combobox_conn_2.grid(row=4, column=0, padx=5, pady=1, sticky="WE")
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
-        self.grid_matrix_frame = tk.Frame(self.main_frame, relief = "ridge", borderwidth=3)
+        self.grid_matrix_frame = tk.Frame(self.layer_top, relief = "ridge", borderwidth=3)
         self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, "--", "--", self)
         self.row_index = 0
         self.col_index += 1
@@ -117,9 +125,10 @@ class Front_End():
             print("selected connector 2 name: --")
     
     def __init__main_frame(self):
-        self.main_frame.geometry("800x500")
+        self.main_frame.geometry("800x600")
+        self.main_frame.minsize(800,600)
         self.main_frame.title("Wiring Tester V"+ str(self.version))
-        self.main_frame.resizable(height=False, width=False)
+        self.main_frame.resizable(height=True, width=True)
     
     def update_selected_connectors(self):
         '''
