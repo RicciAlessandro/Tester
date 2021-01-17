@@ -16,24 +16,29 @@ class Front_End():
         self.debug = True
         self.main_frame = tk.Tk()
         self.__init__main_frame()
-        self.layer_top = tk.Frame(self.main_frame, relief="groove", borderwidth=2, padx=2, pady=2)
-        self.layer_low = tk.Frame(self.main_frame, relief="groove", borderwidth=2)
+        self.layer_left = tk.Frame(self.main_frame, relief="groove", borderwidth=2, padx=2, pady=2)
+        self.layer_right = tk.Frame(self.main_frame, relief="groove", borderwidth=2)
         self.main_frame.grid_columnconfigure(1,weight=1)
         self.main_frame.grid_rowconfigure(0,weight=1)
-        #self.layer_top.grid_columnconfigure(0,weight=1) # le commento perchè non voglio che queste colonne si espandano quando faccio un resize
-        #self.layer_top.grid_columnconfigure(1,weight=1)
-        self.layer_top.grid_columnconfigure(2,weight=2)
-        self.layer_top.grid_rowconfigure(0,weight=2)
-        self.layer_low.grid_columnconfigure(0,weight=1)
-        self.layer_low.grid_rowconfigure(0,weight=1)
-        self.layer_top.grid(row=0,column=0,sticky="nswe")
-        self.layer_low.grid(row=0,column=1,sticky="nswe")
-        self.dashboard_frame = tk.Frame(self.layer_top,relief="groove", borderwidth=2)
-        self.terminal_frame = tk.Frame(self.layer_top,relief="groove", borderwidth=2)
+        #self.layer_left.grid_columnconfigure(0,weight=1) # le commento perchè non voglio che queste colonne si espandano quando faccio un resize
+        #self.layer_left.grid_columnconfigure(1,weight=1)
+        #self.layer_left.grid_columnconfigure(2,weight=2)
+        self.layer_left.grid_rowconfigure(1,weight=1)
+        self.layer_right.grid_columnconfigure(0,weight=1)
+        self.layer_right.grid_rowconfigure(0,weight=1)
+        self.layer_left.grid(row=0,column=0,sticky="nswe")
+        self.layer_right.grid(row=0,column=1,sticky="nswe")
+        self.layer_left.grid_rowconfigure(1,weight=1)
+        self.dashboard_frame = tk.Frame(self.layer_left,relief="groove", borderwidth=2)
+        self.terminal_frame = tk.Frame(self.layer_left,relief="groove", borderwidth=2)
         self.dashboard_frame.grid(row=0,column=0,sticky="n")
-        self.terminal_frame.grid(row=1,column=0)
-        #tk.Button(self.layer_low).grid()
-        #wid = self.layer_low.winfo_id()
+        self.terminal_frame.grid(row=1,column=0,sticky="nwes")
+        self.dashboard_frame.grid_columnconfigure(0,weight=1)
+        self.terminal_frame.grid_columnconfigure(0,weight=1)
+        self.dashboard_frame.grid_rowconfigure(0,weight=1)
+        #elf.terminal_frame.grid_rowconfigure(0,weight=1)
+        #tk.Button(self.layer_right).grid()
+        #wid = self.layer_right.winfo_id()
         #os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
         
         self.left_1_frame = tk.Frame(self.dashboard_frame)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
@@ -56,7 +61,7 @@ class Front_End():
         self.row_index = 0
         self.col_index = 0
         
-        self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command,self, self.connectors)
+        self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command,self.terminal_frame,self, self.connectors)
         self.frame_serial_dash.grid(row=0, column=0, padx=0, pady=1, sticky="we")
         self.frame_serial_command.grid(row=1, column=0, padx=5, pady=1, sticky="we")
         self.serial_manager.disable_commands()
@@ -108,7 +113,7 @@ class Front_End():
         self.combobox_conn_2.grid(row=4, column=0, padx=5, pady=1, sticky="WE")
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
-        self.grid_matrix_frame = tk.Frame(self.layer_low, relief = "ridge", borderwidth=3)
+        self.grid_matrix_frame = tk.Frame(self.layer_right, relief = "ridge", borderwidth=3)
         self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, "--", "--", self)
         self.row_index = 0
         self.col_index += 1
@@ -141,6 +146,7 @@ class Front_End():
             print("selected connector 2 name: ", self.selected_connector_2.get_name())
         else:
             print("selected connector 2 name: --")
+        print(self.serial_manager.serial_terminal.serial_buffer)
     
     def __init__main_frame(self):
         self.main_frame.geometry("800x600")

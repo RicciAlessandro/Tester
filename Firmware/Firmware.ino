@@ -134,11 +134,29 @@ void loop() {
     break;*/
   case 0b11111111:  // totalCheck
     {
-      Serial.print("total check\n\n");
+      Serial.print("_____________________\n");
+      Serial.print("START TOTAL CHECK\n");
       _delay_ms(10);
-      //numero pin lo dovrebbe ricavare in automatico
-      //nPinConn1 = 3;
-      //nPinConn2 = 4;
+      // legge e risponde con il nome del primo connettore
+      while(true){
+        if(Serial.available() > 0){
+          Serial.print("conn1:\t");
+          Serial.print(Serial.readStringUntil('\n'));
+          break;
+          // do i need to clear Serial buffer?
+        }
+      }
+      Serial.print('\n');
+      // legge e risponde con il nome del secondo connettore
+      while(true){
+        if(Serial.available() > 0){
+          Serial.print("conn2:\t");
+          Serial.print(Serial.readStringUntil('\n'));
+          break;
+          // do i need to clear Serial buffer?
+        }
+      }
+      Serial.print("\n");
       while(true){
         if(Serial.available() > 0){
           nPinConn1 = Serial.read();
@@ -153,32 +171,39 @@ void loop() {
           // do i need to clear Serial buffer?
         }
       }
+      Serial.print("nPin1\t");
+      Serial.print(nPinConn1);
+      Serial.print("\n");
+      Serial.print("nPin2\t");
+      Serial.print(nPinConn2);
+      Serial.print("\n");
+
+      Serial.print("Connection Matrix:\n");
       for(int i=0; i<nPinConn1; i++){
         setSingleAddress(tester, i, true);
         for(int j=0; j<nPinConn2; j++){
           setSingleAddress(tester, j, false);
           _delay_ms(100);
           if(tester.testWire()==true){
-            //Serial.print("1 ");
-            Serial.write(0b11111111);
-            Serial.write(0b00001111);
+            Serial.print("1");
+            if(j<nPinConn2-1){
+              Serial.print("-");
+            }
+            //Serial.write(0b11111111);
+            //Serial.write(0b00001111);
           }
           else{
-            //Serial.print("0 ");
-            Serial.write(0b11111111);
-            Serial.write(0b00000001);
+            Serial.print("0");
+            if(j<nPinConn2-1){
+              Serial.print("-");
+            }
+            //Serial.write(0b11111111);
+            //Serial.write(0b00000001);
           }
           //boolMatrix[i][j] = tester.testWire();
         }
-        //Serial.print("\n");
+        Serial.print("\n");
       }
-      Serial.print("nPin1\n");
-      Serial.print(nPinConn1);
-      Serial.print("\n");
-      Serial.print("nPin2\n");
-      Serial.print(nPinConn2);
-      Serial.print("\n");
-          
       /*
       for(int i=0; i<nPinConn1; i++){
         for(int j=0; j<nPinConn2; j++){
@@ -189,8 +214,7 @@ void loop() {
             Serial.print(j);
           }
         }*/
-      
-    
+      Serial.print("END TOTAL CHECK\n");
       Serial.print("_____________________\n");
     }
     break;  
