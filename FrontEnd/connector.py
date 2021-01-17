@@ -30,9 +30,9 @@ class ConnectorTable():
         self.parent_frame.configure(pady=2,padx=2,relief="raised",borderwidth=1)
         self.frame_conn_1 = tk.Frame(self.parent_frame,relief="sunken",borderwidth=1)
         self.frame_conn_2 = tk.Frame(self.parent_frame,relief="sunken",borderwidth=1)
-        self.frame_conn_1.grid_columnconfigure(0, weight=1)
-        self.frame_conn_2.grid_columnconfigure(0, weight=1)
-        self.label_1  = tk.Label(self.frame_conn_1, text="CONN 1: ", anchor = "w")
+        self.frame_conn_1.grid_columnconfigure(1, weight=1) #necessario per far agire lo sticky, non ho dato un peso alla colonna 0 cosi si espande solo la 1
+        self.frame_conn_2.grid_columnconfigure(1, weight=1)
+        self.label_1  = tk.Label(self.frame_conn_1, text="CONN 1: ", anchor = "w", justify = "left")
         self.label_1_1  = tk.Label(self.frame_conn_1, text=" -- ", height = 1, width = 20)
         self.label_2  = tk.Label(self.frame_conn_1, text="N PIN 1:", anchor = "w")
         self.label_2_1  = tk.Label(self.frame_conn_1, text=" -- ", height = 1, width = 20)

@@ -44,9 +44,9 @@ class SerialManager(object):
         self.button_address = tk.Button(self.frame_2, text="CHECK ADDRESS", command=self.send_address)
         self.button_read = tk.Button(self.frame_2, text="READ RESPONSE", command=self.read_response)
 
-        self.button_total_check.grid(row=0,column=0, padx=5, pady=1, sticky="WE")
-        self.button_address.grid(row=1,column=0, padx=5, pady=1, sticky="WE")
-        self.button_read.grid(row=2,column=0, padx=5, pady=1, sticky="WE")
+        self.button_total_check.grid(row=0,column=0, padx=2, pady=1, sticky="WE")
+        self.button_address.grid(row=1,column=0, padx=2, pady=1, sticky="WE")
+        self.button_read.grid(row=2,column=0, padx=2, pady=1, sticky="WE")
 
     def get_serial_ports(self):
         '''
@@ -130,52 +130,58 @@ class SerialManager(object):
         self.ser.write(bytes([0b11111111]))
         print(self.app.connectors)      #QUI SE METTO SELF.CONNECTORS NON SI AGGIORNA AL CAMBIARE DELLA LISTA DEI CONNETTORI DI APP
         
-        print(self.app.selected_connector_1.get_n_pin())
-        print(self.app.selected_connector_2.get_n_pin())
+        if self.app.selected_connector_1:
+            if self.app.selected_connector_2:
+                print(self.app.selected_connector_1.get_n_pin())
+                print(self.app.selected_connector_2.get_n_pin())
 
-        self.ser.write([self.app.selected_connector_1.get_n_pin()])
-        self.ser.write([self.app.selected_connector_2.get_n_pin()])
-        #time.sleep(0.8)
-        for i in range(self.app.selected_connector_1.get_n_pin()):
-            for j in range(self.app.selected_connector_2.get_n_pin()):
-                time_base = time.time()
-                while(True):
-                    if self.ser.in_waiting:
-                        readed_line = self.ser.read() # b'\x03'
-                        #print("prefisso: ",readed_line)
-                        if readed_line==b'\xff':
-                            print("EOL find")
-                            break
-                        elif(time.time()-time_base>self.wait_timeout):
-                            print("ERROR time elapsed")
-                            return
-                time_base = time.time()
-                while(True):
-                    if self.ser.in_waiting:
-                        readed_line = self.ser.read() # b'\x03'
-                        print("byte letto", readed_line)
-                        #print("prefisso: ",readed_line)
-                        if(readed_line==b'\x0f'):
-                            print("OK 1 ", j)
-                            self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 1
-                            self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 1
-                            break
-                        elif(readed_line==b'\01'):
-                            print("OK 2 ", j)
-                            self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 0
-                            self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 0
-                            break
-                        else:
-                            self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 5
-                            self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 5
-                            print("reading ERROR")
-                            break
-                    elif(time.time()-time_base>self.wait_timeout):
-                        print("ERROR time elapsed with no response")
-                        return
-        print(self.app.continuity)      
-        self.app.grid_matrix.render_2()
-        
+                self.ser.write([self.app.selected_connector_1.get_n_pin()])
+                self.ser.write([self.app.selected_connector_2.get_n_pin()])
+                #time.sleep(0.8)
+                for i in range(self.app.selected_connector_1.get_n_pin()):
+                    for j in range(self.app.selected_connector_2.get_n_pin()):
+                        time_base = time.time()
+                        while(True):
+                            if self.ser.in_waiting:
+                                readed_line = self.ser.read() # b'\x03'
+                                #print("prefisso: ",readed_line)
+                                if readed_line==b'\xff':
+                                    print("EOL find")
+                                    break
+                                elif(time.time()-time_base>self.wait_timeout):
+                                    print("ERROR time elapsed")
+                                    return
+                        time_base = time.time()
+                        while(True):
+                            if self.ser.in_waiting:
+                                readed_line = self.ser.read() # b'\x03'
+                                print("byte letto", readed_line)
+                                #print("prefisso: ",readed_line)
+                                if(readed_line==b'\x0f'):
+                                    print("OK 1 ", j)
+                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 1
+                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 1
+                                    break
+                                elif(readed_line==b'\01'):
+                                    print("OK 2 ", j)
+                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 0
+                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 0
+                                    break
+                                else:
+                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 5
+                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 5
+                                    print("reading ERROR")
+                                    break
+                            elif(time.time()-time_base>self.wait_timeout):
+                                print("ERROR time elapsed with no response")
+                                return
+                print(self.app.continuity)      
+                self.app.grid_matrix.render_2()
+            else:
+                print("nessun connettore 2 selezionato")
+        else:
+            print("nessun connettore 1 selezionato")
+    
     def read_response(self):
         a = self.ser.readline()
         print(a)

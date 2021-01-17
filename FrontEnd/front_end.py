@@ -6,30 +6,48 @@ from connector import *
 from grid_matrix import *
 from data_file_stream import *
 from serial_manager import *
+import os
 #import connector
       
 class Front_End():
     def __init__(self):
         #METODI PER LA CONFIGURAZIONE DELLA FINESTRA principale
         self.version = 0.01
+        self.debug = True
         self.main_frame = tk.Tk()
         self.__init__main_frame()
         self.layer_top = tk.Frame(self.main_frame, relief="groove", borderwidth=2, padx=2, pady=2)
         self.layer_low = tk.Frame(self.main_frame, relief="groove", borderwidth=2)
-        self.layer_top.grid_columnconfigure(0,weight=1)
+        self.main_frame.grid_columnconfigure(1,weight=1)
+        self.main_frame.grid_rowconfigure(0,weight=1)
+        #self.layer_top.grid_columnconfigure(0,weight=1) # le commento perchè non voglio che queste colonne si espandano quando faccio un resize
+        #self.layer_top.grid_columnconfigure(1,weight=1)
+        self.layer_top.grid_columnconfigure(2,weight=2)
         self.layer_top.grid_rowconfigure(0,weight=2)
         self.layer_low.grid_columnconfigure(0,weight=1)
         self.layer_low.grid_rowconfigure(0,weight=1)
         self.layer_top.grid(row=0,column=0,sticky="nswe")
-        self.layer_low.grid(row=1,column=0,sticky="nswe")
+        self.layer_low.grid(row=0,column=1,sticky="nswe")
+        self.dashboard_frame = tk.Frame(self.layer_top,relief="groove", borderwidth=2)
+        self.terminal_frame = tk.Frame(self.layer_top,relief="groove", borderwidth=2)
+        self.dashboard_frame.grid(row=0,column=0,sticky="n")
+        self.terminal_frame.grid(row=1,column=0)
+        #tk.Button(self.layer_low).grid()
+        #wid = self.layer_low.winfo_id()
+        #os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
         
-        self.left_1_frame = tk.Frame(self.layer_top)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
+        self.left_1_frame = tk.Frame(self.dashboard_frame)# relief = "raised", borderwidth=1,padx=2,pady=1) #bg = "pink")
         self.left_1_frame.grid_columnconfigure(0,weight=1)
-        self.left_2_frame = tk.Frame(self.layer_top)#, relief = "raised", borderwidth=1,padx=2,pady=1) # bg = "green")
+        self.left_2_frame = tk.Frame(self.dashboard_frame)#, relief = "raised", borderwidth=1,padx=2,pady=1) # bg = "green")
+        self.left_2_frame.grid_columnconfigure(0,weight=1)
         self.frame_serial_dash = tk.Frame(self.left_1_frame, relief = "ridge", borderwidth = 4, padx = 2, pady = 1)# bg = "black")
-        self.frame_serial_command = tk.Frame(self.left_2_frame, bg = "blue")
-        self.frame_IO = tk.Frame(self.left_1_frame, relief = "flat", borderwidth = 4, padx = 2, pady = 1) #, bg="red", relief = "raised", borderwidth=1,
-        self.debug = True
+        self.frame_serial_command = tk.Frame(self.left_2_frame, pady = 5)#, relief = "flat", borderwidth = 4, padx = 2, pady = 1) #bg = "blue")
+        self.frame_IO = tk.Frame(self.left_2_frame, relief = "flat", borderwidth = 4, padx = 2, pady = 1) #, bg="red", relief = "raised", borderwidth=1,
+        self.frame_serial_dash.grid_columnconfigure(0,weight=1)
+        #self.left_2_frame.grid_columnconfigure(0,weight=1)
+        #self.left_1_frame.grid_propagate(False)
+        #self.left_2_frame.grid_propagate(False)
+
         self.connectors = []
         self.continuity = {}
         self.selected_connector_1 = None
@@ -39,8 +57,8 @@ class Front_End():
         self.col_index = 0
         
         self.serial_manager = SerialManager(self.frame_serial_dash, self.frame_serial_command,self, self.connectors)
-        self.frame_serial_dash.grid(row=0, column=0, padx=0, pady=1) # sticky="we")
-        self.frame_serial_command.grid(row=10, column=0, padx=5, pady=1, sticky="we")
+        self.frame_serial_dash.grid(row=0, column=0, padx=0, pady=1, sticky="we")
+        self.frame_serial_command.grid(row=1, column=0, padx=5, pady=1, sticky="we")
         self.serial_manager.disable_commands()
         self.row_index += 1
         #LISTA CONNETTORI
@@ -63,11 +81,11 @@ class Front_End():
         self.button_del_conn.grid(row=6, column=0, sticky="WE")
         self.row_index+=1
         self.data_file_stream = DataFileStream(self.frame_IO, self) # self.continuity
-        self.frame_IO.grid(row=self.row_index, column=0, sticky="WE")
+        self.frame_IO.grid(row=2, column=0, sticky="WE")
         #COL2
         self.connectors_frame = tk.Frame(self.left_2_frame)
         self.connector_table = ConnectorTable(self.connectors_frame, self)
-        self.connectors_frame.grid(row=10,column=0)
+        self.connectors_frame.grid(row=0,column=0,sticky="we")
         self.row_index = 0
         #self.col_index = 1
         #connettore1
@@ -90,19 +108,19 @@ class Front_End():
         self.combobox_conn_2.grid(row=4, column=0, padx=5, pady=1, sticky="WE")
         #self.combobox_conn_2.bind("<<ComboboxSelected>>", self.combobox_conn_2_update)
         self.row_index+=1
-        self.grid_matrix_frame = tk.Frame(self.layer_top, relief = "ridge", borderwidth=3)
+        self.grid_matrix_frame = tk.Frame(self.layer_low, relief = "ridge", borderwidth=3)
         self.grid_matrix = GridMatrix(self.grid_matrix_frame, self.continuity, 0, 0, "--", "--", self)
         self.row_index = 0
         self.col_index += 1
-        self.left_1_frame.grid(row=0, column=0, sticky="nwe")
-        self.left_2_frame.grid(row=0, column=1, sticky="n")
-        self.grid_matrix_frame.grid(row=0, column=2, sticky="n")
+        self.left_1_frame.grid(row=0, column=0, sticky="nswe")
+        self.left_2_frame.grid(row=0, column=1, sticky="nswe")
+        self.grid_matrix_frame.grid(row=0, column=0, sticky="nswe")
 
         if self.debug:
-            self.btn_print_cont = tk.Button(self.left_1_frame, text="print cont", command=self.print_cont)
+            self.btn_print_cont = tk.Button(self.left_2_frame, text="print cont", command=self.print_cont)
             self.btn_print_cont.grid()
 
-            self.btn_render = tk.Button(self.left_1_frame, text="render", command=self.grid_matrix.render_2)
+            self.btn_render = tk.Button(self.left_2_frame, text="render", command=self.grid_matrix.render_2)
             self.btn_render.grid()
         
     def print_cont(self):
@@ -128,7 +146,10 @@ class Front_End():
         self.main_frame.geometry("800x600")
         self.main_frame.minsize(800,600)
         self.main_frame.title("Wiring Tester V"+ str(self.version))
-        self.main_frame.resizable(height=True, width=True)
+        if self.debug:
+            self.main_frame.resizable(height=True, width=True)
+        else:
+            self.main_frame.resizable(height=False, width=False)
     
     def update_selected_connectors(self):
         '''

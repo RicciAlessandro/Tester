@@ -8,20 +8,26 @@ qui il dubbio è:
 '''
 class GridMatrix():
     def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
-        self.scroll_height = 390
-        self.scroll_width = 310
+        self.scroll_height = 800
+        #self.scroll_width = 400
         self.app = _app
         self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
         self.main_frame_2 = tk.Frame(self.main_frame, relief = "flat",borderwidth=1)#, height=self.scroll_height, width=self.scroll_width ) #bg = "blue"
         self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
         self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
-        self.canvas = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set, height=self.scroll_height, width=self.scroll_width, relief = "flat",borderwidth=2) #bg = "green",
+        self.canvas = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, xscrollcommand=self.myscrollbar2.set)#, height=self.scroll_height, width=self.scroll_width, relief = "flat",borderwidth=2) #bg = "green",
         self.canvas_1 = tk.Canvas(self.main_frame_2, yscrollcommand=self.myscrollbar.set, height=self.scroll_height, width=20, relief = "flat",borderwidth=2) # bg = "purple",
-        self.canvas_2 = tk.Canvas(self.main_frame_2, xscrollcommand=self.myscrollbar2.set, height=20, width=self.scroll_width, relief = "flat",borderwidth=2) # bg = "white",
+        self.canvas_2 = tk.Canvas(self.main_frame_2, xscrollcommand=self.myscrollbar2.set, height=20)#, width=self.scroll_width, relief = "flat",borderwidth=2) # bg = "white",
+        self.main_frame.grid_columnconfigure(1,weight=1)
+        self.main_frame_2.grid_columnconfigure(1,weight=1)
+        self.canvas.grid_columnconfigure(0,weight=1)
+        self.main_frame.grid_rowconfigure(1,weight=1)
+        self.main_frame_2.grid_rowconfigure(1,weight=1)
+        self.canvas.grid_rowconfigure(0,weight=1)
         #self.main_frame_2.grid_propagate(0)
-        self.canvas.grid_propagate(0)
-        self.canvas_1.grid_propagate(0)
-        self.canvas_2.grid_propagate(0)
+        #self.canvas.grid_propagate(0)
+        #self.canvas_1.grid_propagate(0)
+        #self.canvas_2.grid_propagate(0)
         #self.main_frame_2.configure(height=1000,width=500)
         #self.main_frame_2.configure(yscrollcommand=self.myscrollbar.set)
         self.myscrollbar.config(command = self.scroll_y)
@@ -43,13 +49,17 @@ class GridMatrix():
         #self.canvas.configure(yscrollcommand=self.myscrollbar.set)
 
         #self.myfunction(None)
-        self.main_frame_2.grid(row=1,column=1)
+        self.main_frame_2.grid(row=1,column=1,sticky="we")
         '''
         self.canvas.pack(side="left", fill="both", expand=True)
         self.myscrollbar.pack(side="left",fill="y")'''
-        self.canvas.grid(row=1,column=1)
+        '''self.canvas.grid(row=1,column=1)
         self.canvas_1.grid(row=1,column=0)
-        self.canvas_2.grid(row=0,column=1)
+        self.canvas_2.grid(row=0,column=1)'''
+
+        self.canvas.grid(row=1,column=1,sticky="nswe")
+        self.canvas_1.grid(row=1,column=0,sticky="ns")
+        self.canvas_2.grid(row=0,column=1,sticky="we")
         self.myscrollbar.grid(row=1,column=2, sticky="ns")
         self.myscrollbar2.grid(row=2,column=1, sticky="we")
         
