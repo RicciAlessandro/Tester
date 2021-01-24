@@ -7,11 +7,13 @@ qui il dubbio è:
     avrei le modifiche anche nell'attributo di questa classe, quindi dovrei richiamare solo il metodo render() indicando quali connettori devo visualizzare
 '''
 class GridMatrix():
-    def __init__(self, _main_frame, _continuity = {}, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--", _app=None):
+    def __init__(self, _app, _gui, _state, _n_pin_1=0, _n_pin_2=0, _conn_1_name="--", _conn_2_name="--"):
+        self.state = _state
+        self.app = _app
+        self.gui = _gui
         self.scroll_height = 800
         #self.scroll_width = 400
-        self.app = _app
-        self.main_frame = _main_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
+        self.main_frame = _gui.grid_matrix_frame #Container = {canvas[main_frame_2 (frame+upper_frame+left_frame)+myscrollbar]}
         self.main_frame_2 = tk.Frame(self.main_frame, relief = "flat",borderwidth=1)#, height=self.scroll_height, width=self.scroll_width ) #bg = "blue"
         self.myscrollbar = tk.Scrollbar(self.main_frame,orient="vertical")#,command=self.canvas.yview)
         self.myscrollbar2 = tk.Scrollbar(self.main_frame,orient="horizontal")
@@ -63,8 +65,6 @@ class GridMatrix():
         self.myscrollbar.grid(row=1,column=2, sticky="ns")
         self.myscrollbar2.grid(row=2,column=1, sticky="we")
         
-        #self.continuity = {}
-        self.continuity = _continuity
         self._n_pin_1 = _n_pin_1
         self._n_pin_2 = _n_pin_2
         self.conn_1_name = _conn_1_name
@@ -107,8 +107,8 @@ class GridMatrix():
         #riempimento label centro
         self.labels_list = []
         #se esiste la matrice di continuità
-        if self.continuity: #se il dizionario non è vuoto
-            if self.continuity[self.conn_1_name][self.conn_2_name]:    
+        if self.state.continuity: #se il dizionario non è vuoto
+            if self.state.continuity[self.conn_1_name][self.conn_2_name]:    
                 for _row in range(self.rows):
                     #print("row= "+str(_row))
                     self.labels_list.append([])
@@ -116,11 +116,11 @@ class GridMatrix():
                         for _col in range(self.cols):
                             #print("col= "+str(_col))
                             if _col < self._n_pin_2:
-                                if(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==1):    
+                                if(self.state.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==1):    
                                     #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                     self.labels_list[_row].append(tk.Label(self.frame, text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white"))
                                     self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                                elif(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==3):    
+                                elif(self.state.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==3):    
                                     self.labels_list[_row].append(tk.Label(self.frame, text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white"))
                                     self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
                                 else:
@@ -180,7 +180,7 @@ class GridMatrix():
         #self.render()
         '''
         #prova del metodo update
-        self.continuity = continuity
+        self.state.continuity = continuity
         self._n_pin_1 = n_pin_1
         self._n_pin_2 = n_pin_2
         self.conn_1_name = list(continuity.keys())[0]
@@ -215,106 +215,11 @@ class GridMatrix():
 
     def update_values(self, _n_pin_1, _n_pin_2, _conn_1_name, _conn_2_name, _continuity = None):
         if _continuity:
-            self.continuity = _continuity
+            self.state.continuity = _continuity
         self.conn_1_name = _conn_1_name
         self.conn_2_name = _conn_2_name
         self._n_pin_1 = _n_pin_1
         self._n_pin_2 = _n_pin_2        
-
-    def render(self):
-        '''
-        aggiorna la vista quando vengono cambiati i connettori selezionati
-        DEVO PRIMA CAMBIARE NPIN1,NPIN2, NOMI DEI CONNETTORI E MATRICE DI CONTINUITA' E POI POSSO CHIAMARE QUESTO METODO
-        '''
-        self.label_conn_1_name.configure(text=self.conn_1_name, wraplength=1, width=1)
-        self.label_conn_2_name.configure(text=self.conn_2_name, height=1)
-        _bg="white"
-        _relief="solid"
-        for _row in range(self.rows):
-            if _row == self._n_pin_1:
-                _bg=self.frame.cget("bg")
-                _relief="sunken"
-            self.labels_pin_index_1[_row].configure(text=str(_row+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
-            #self.labels_pin_index_1[_row].grid(row=_row+1, column=0, sticky="nsew")
-        _bg="white"
-        _relief="solid"
-        for _col in range(self.cols):
-            if _col == self._n_pin_2:
-                _bg=self.frame.cget("bg")
-                _relief="sunken"
-            self.labels_pin_index_2[_col].configure(text=str(_col+1),  borderwidth=1, relief=_relief, bg=_bg, width=2, height=1,)
-            #self.labels_pin_index_2[_col].grid(row=0, column=_col+1)
-       
-        #se esiste la matrice di continuità
-        if self.continuity: #se il dizionario non è vuoto
-            if self.continuity[self.conn_1_name][self.conn_2_name]:    
-                for _row in range(self.rows):
-                    #print("row= "+str(_row))
-                    #self.labels_list.append([])
-                    if _row < self._n_pin_1:
-                        for _col in range(self.cols):
-                            #print("col= "+str(_col))
-                            if _col < self._n_pin_2:
-                                if(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==1):    
-                                    #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                    self.labels_list[_row][_col].configure(text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white")
-                                    #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                                elif(self.continuity[self.conn_1_name][self.conn_2_name][_row][_col]==3):
-                                    self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
-                                else:
-                                    self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white")
-                                    #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                            else:
-                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="gray")
-                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                    else:
-                        for _col in range(self.cols):
-                            #print("col= "+str(_col))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="red")
-                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-            else:  #se esistorno i connettori ma non esiste la matrice di continuità
-                for _row in range(self.rows):
-                    #print("row= "+str(_row))
-                    #self.labels_list.append([])
-                    if _row < self._n_pin_1:
-                        for _col in range(self.cols):
-                            #print("col= "+str(_col))
-                            if _col < self._n_pin_2:
-                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
-                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                            else:
-                                #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                                self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="yellow")
-                                #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                    else:
-                        for _col in range(self.cols):
-                            #print("col= "+str(_col))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="pink")
-                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        else: #se il dizionario di continuità ancora non esiste, fai il render con le linee per i pin che sono compresi nel connettore e grigio altrove
-            #print("OCCHIO CHE SONO ENTRATO IN UN FLUSSO STRANO: NON ESISTE IL DIZIONARIO DI CONTINUITA' O E' VUOTO MA ESISTONO GIA I CONNETTORI")
-            for _row in range(self.rows):
-                #print("row= "+str(_row))
-                #self.labels_list.append([])
-                if _row < self._n_pin_1:
-                    for _col in range(self.cols):
-                        #print("col= "+str(_col))
-                        if _col < self._n_pin_2:
-                            self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
-                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                        else:
-                            #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
-                            self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="black")
-                            #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                else:
-                    for _col in range(self.cols):
-                        #print("col= "+str(_col))
-                        self.labels_list[_row][_col].configure(text= " ", borderwidth=1, relief="sunken", width=2, height=1, bg="green")
-                        #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-        #self.frame.grid(row=1,column=1)
-        self.myfunction(None)
 
     def render_2(self):
         '''
@@ -323,16 +228,16 @@ class GridMatrix():
         '''
         print("render 2")
         #questo sarebbe l'update
-        if self.app.selected_connector_1:
-            _conn_1_name = self.app.selected_connector_1.get_name()
-            _n_pin_1 = self.app.selected_connector_1.get_n_pin()
+        if self.state.selected_connector_1:
+            _conn_1_name = self.state.selected_connector_1.get_name()
+            _n_pin_1 = self.state.selected_connector_1.get_n_pin()
             #print("ok")
         else:
             _conn_1_name = "--"
             _n_pin_1 = 0
-        if self.app.selected_connector_2:
-            _conn_2_name = self.app.selected_connector_2.get_name()
-            _n_pin_2 = self.app.selected_connector_2.get_n_pin()
+        if self.state.selected_connector_2:
+            _conn_2_name = self.state.selected_connector_2.get_name()
+            _n_pin_2 = self.state.selected_connector_2.get_n_pin()
             #print("ok")
         else:
             _conn_2_name = "--"
@@ -362,8 +267,8 @@ class GridMatrix():
                 for _col in range(self.cols):
                     self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="sunken", width=2, height=1, bg=self.frame.cget("bg"))
             #se esiste la matrice di continuità
-        elif self.app.continuity: #se il dizionario non è vuoto
-            if self.app.continuity[_conn_1_name][_conn_2_name]:    
+        elif self.state.continuity: #se il dizionario non è vuoto
+            if self.state.continuity[_conn_1_name][_conn_2_name]:    
                 for _row in range(self.rows):
                     #print("row= "+str(_row))
                     #self.labels_list.append([])
@@ -371,11 +276,11 @@ class GridMatrix():
                         for _col in range(self.cols):
                             #print("col= "+str(_col))
                             if _col < _n_pin_2:
-                                if self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]==1:    
+                                if self.state.continuity[_conn_1_name][_conn_2_name][_row][_col]==1:    
                                     #self.labels_list[_row].append(tk.Label(self.frame, text=str(_row)+"-"+str(_col), borderwidth=1, relief="ridge", width=2, height=1))
                                     self.labels_list[_row][_col].configure(text="x", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                     #self.labels_list[_row][_col].grid(row=_row+1, column=_col+1, sticky="NSWE")
-                                elif self.app.continuity[_conn_1_name][_conn_2_name][_row][_col]==3:
+                                elif self.state.continuity[_conn_1_name][_conn_2_name][_row][_col]==3:
                                     self.labels_list[_row][_col].configure(text="-", borderwidth=1, relief="solid", width=2, height=1, bg="white")
                                 else:
                                     self.labels_list[_row][_col].configure(text=" ", borderwidth=1, relief="solid", width=2, height=1, bg="white")
@@ -462,6 +367,6 @@ if __name__ == "__main__":
     continuity_3 = {}
 
     #grid_matrix = GridMatrix(main_frame, continuity_3, n_pin_1,n_pin_2, list(continuity.keys())[0], list(continuity.keys())[1])
-    grid_matrix = GridMatrix(main_frame)
+    grid_matrix = GridMatrix(main_frame, None, None)
  
     main_frame.mainloop()

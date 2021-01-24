@@ -10,31 +10,33 @@ class DataFileStream():
     """
     docstring
     """
-    def __init__(self, _main_frame, _app=None): #_continuity=None
-        #self.continuity = _continuity
-        self.main_frame = _main_frame
+    def __init__(self, _app, _gui, _state): #_continuity=None
         self.app = _app
+        self.gui = _gui
+        self.state = _state
+        self.main_frame = self.gui.frame_IO
         self.directory = None # TODO IN REALTA' QUI CI DEVO METTERE IL PERCORSO BASE DOVE DOVREI TROVARE I DB
-        self.save_button = SaveButton(self.main_frame, self)
-        self.select_dir = SelectDir(self.main_frame, self)
+        self.save_button = SaveButton(self.main_frame, self, self.state)
+        self.select_dir = SelectDir(self.main_frame, self, self.state)
 
-        if self.app.debug:
-            self.load_button = LoadButton(self.main_frame, self)
+        if self.state.debug:
+            self.load_button = LoadButton(self.main_frame, self, self.state)
         #self.save_button.grid(row=0, sticky=tk.EW, padx=5, pady=1)#rowspan=3
         #self.load_button.grid(row=1, sticky=tk.EW, padx=5, pady=1)
         
         self.select_dir.pack(fill="x")#, padx=5, pady=1)
         self.save_button.pack(fill="x")#, padx=5, pady=1)
-        if self.app.debug:
+        if self.state.debug:
             self.load_button.pack(fill="x")#, padx=5, pady=1)
 
 class SaveButton(tk.Button):
-    def __init__(self, _master, _data_file_stream):
+    def __init__(self, _master, _data_file_stream, _state):
         super().__init__(_master, text="SALVA SU FILE", command=self.on_press)
         self.data_file_stream = _data_file_stream 
+        self.state = _state
 
     def on_press(self):
-        if self.data_file_stream.app.continuity:
+        if self.state.continuity:
             #self.data_file_stream.directory = filedialog.askdirectory(initialdir=r".\FrontEnd\DB\Default")
             self.data_file_stream.file = filedialog.asksaveasfilename(
                 defaultextension='.xlsx', filetypes=[("xlsx files", '*.xlsx')],
@@ -56,10 +58,10 @@ class SaveButton(tk.Button):
                         writer = pd.ExcelWriter(_path, engine="openpyxl") # pylint: disable=abstract-class-instantiated
                         _conns = []
                         _pins = []
-                        for k,v in self.data_file_stream.app.continuity.items():
+                        for k,v in self.state.continuity.items():
                             #trova il numero di pin del connettore
                             
-                            for _conn in self.data_file_stream.app.connectors:
+                            for _conn in self.state.connector_list:
                                 if _conn.get_name() == k:
                                     _conns.append(_conn.get_name())
                                     _pins.append(_conn.get_n_pin())
@@ -77,9 +79,9 @@ class SaveButton(tk.Button):
 
                     #SALVA I CONNETTORI NEI RELATIVI FILE
                     try:
-                        for k,v in self.data_file_stream.app.continuity.items():
+                        for k,v in self.state.continuity.items():
                             #trova il numero di pin del connettore
-                            for _conn in self.data_file_stream.app.connectors:
+                            for _conn in self.state.connector_list:
                                 if _conn.get_name() == k:
                                     _n_pin = _conn.get_n_pin()
                                     print("OOK", _conn.get_name())
@@ -116,9 +118,11 @@ class SaveButton(tk.Button):
             return
 
 class SelectDir(tk.Button):
-    def __init__(self, _master, _data_file_stream):
+    def __init__(self, _master, _data_file_stream, _state):
         super().__init__(_master, text="APRI FILE", command=self.on_press)
         self.data_file_stream = _data_file_stream 
+        self.state = _state
+
 
     def on_press(self):
         #messagebox.showinfo("Seleziona Directory valida", "seleziona una cartella contenente un a configurazione valida (config.xlsx e relativi db connettori)")
@@ -181,30 +185,30 @@ class SelectDir(tk.Button):
             # todo controllo se continuity già esiste e richiesta a procedere
 
             #AGGIUNGE I CONNETTORI E AGGIORNA LA LISTBOX.
-            self.data_file_stream.app.connectors = []
+            self.state.connector_list = []
             for _conn in list(_n_pin_dict.keys()):
                 _new_conn = Connector(_n_pin_dict[_conn],_conn,1)
-                self.data_file_stream.app.connectors.append(_new_conn)
-            self.data_file_stream.app.listbox_update()
+                self.state.connector_list.append(_new_conn)
+            self.data_file_stream.app.connector_manager.listbox_update()
             #qui voglio attivare l'utlimo elemento della lista cioè none, e voglio che i connettori si settino a none e faccia il render della nuova situazione
-            self.data_file_stream.app.to_none_selected_connectors()
+            self.data_file_stream.app.connector_manager.to_none_selected_connectors()
             
             #costruisco il dizionario con le chiavi:
-            self.data_file_stream.app.continuity = {}
-            for _conn_1 in self.data_file_stream.app.connectors:
-                self.data_file_stream.app.continuity[_conn_1.get_name()] = {}
-                for _conn_2 in self.data_file_stream.app.connectors:
+            self.state.continuity = {}
+            for _conn_1 in self.state.connector_list:
+                self.state.continuity[_conn_1.get_name()] = {}
+                for _conn_2 in self.state.connector_list:
                     if _conn_2.get_name() != _conn_1.get_name():
-                        self.data_file_stream.app.continuity[_conn_1.get_name()][_conn_2.get_name()]=[]
+                        self.state.continuity[_conn_1.get_name()][_conn_2.get_name()]=[]
             print("result")
-            print(self.data_file_stream.app.continuity)
+            print(self.state.continuity)
 
             #CARICA DATI DAI FILE:
             print("POPOLA DIZIONARIO CONTINUITA'")
-            for _conn_1 in list(self.data_file_stream.app.continuity.keys()):
+            for _conn_1 in list(self.state.continuity.keys()):
                 print(_conn_1)
                 #LEGGI LE CONFIGURAZIONI --> OUTPUT N_PIN_CONN_DIST (dizonario contenente il nome dei connettori con il numero di pin)
-                for _conn_2 in list(self.data_file_stream.app.continuity[_conn_1].keys()):
+                for _conn_2 in list(self.state.continuity[_conn_1].keys()):
                     if _conn_1 != _conn_2:
                         _connection_matrix = []
                         try:
@@ -230,19 +234,20 @@ class SelectDir(tk.Button):
                         #print(readed_data["conn"])
                         _connection_matrix = list(map(list,zip(*_connection_matrix)))
                         print(_connection_matrix)
-                        self.data_file_stream.app.continuity[_conn_1][_conn_2]=_connection_matrix
+                        self.state.continuity[_conn_1][_conn_2]=_connection_matrix
         
         
 class LoadButton(tk.Button):
-    def __init__(self, _master, _data_file_stream):
+    def __init__(self, _master, _data_file_stream, _state):
         super().__init__(_master,text="APRI config base", command=self.on_press)
         self.data_file_stream = _data_file_stream
+        self.state = _state
         
     def on_press(self):
         #print(self.data_file_stream.continuity)
         #with self.data_file_stream.app as up:
-            print(self.data_file_stream.app.continuity)
-            if self.data_file_stream.app.continuity:
+            print(self.state.continuity)
+            if self.state.continuity:
                 print("Tutte le misure e le configurazioni non salvate andranno \
 perse. Sei sicuro di voler caricare i dati?")
                     #return
@@ -259,21 +264,21 @@ perse. Sei sicuro di voler caricare i dati?")
             n_pin_dict = {"conn1":n_pin_1, "conn2":n_pin_2, "conn3":n_pin_3}
             #-----------------------------
             #self.data_file_stream.continuity = _cont       # SE PASSO QUESTO NON MI AGGIORNA L'ATTRIBUTO DELLA CLASSE PADRE 
-            self.data_file_stream.app.continuity = _cont   # SE PASSO QUESTO MI AGGIORNA ANCHE L'ATTRIBTO DELLA CLASSE PADRE
-            #self.data_file_stream.app.continuity.clear()
-            #self.data_file_stream.app.continuity.append(_cont)
+            self.state.continuity = _cont   # SE PASSO QUESTO MI AGGIORNA ANCHE L'ATTRIBTO DELLA CLASSE PADRE
+            #self.state.continuity.clear()
+            #self.state.continuity.append(_cont)
 
             #print(self.data_file_stream.continuity)
-            print(self.data_file_stream.app.continuity)
-            self.data_file_stream.app.connectors = []  #CLEAR DELLA LISTA
-            _conn_name = list(self.data_file_stream.app.continuity.keys())
+            print(self.state.continuity)
+            self.state.connector_list = []  #CLEAR DELLA LISTA
+            _conn_name = list(self.state.continuity.keys())
             k=0
             for c in _conn_name:
                 _new_conn = Connector(n_pin_list[k],c,1)
-                self.data_file_stream.app.connectors.append(_new_conn)
+                self.state.connector_list.append(_new_conn)
                 k+=1
-            self.data_file_stream.app.listbox_update()
-            self.data_file_stream.app.none_selected_connectors()
+            self.data_file_stream.app.connector_manager.listbox_update()
+            self.data_file_stream.app.connector_manager.none_selected_connectors()
             # lettura file creati
 
 
@@ -282,5 +287,5 @@ perse. Sei sicuro di voler caricare i dati?")
 
 if __name__ == "__main__":
     main_frame = tk.Tk()
-    frame_IO = DataFileStream(main_frame)
+    frame_IO = DataFileStream(main_frame, None, None)
     main_frame.mainloop()

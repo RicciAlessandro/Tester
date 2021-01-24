@@ -8,14 +8,16 @@ class SerialManager(object):
     """
     docstring
     """
-    def __init__(self, _frame_1, _frame_2, _frame_3, _app, _connectors):
-        self.connectors = _connectors
-        self.ser = serial.Serial()
-        self.frame_1 = _frame_1
-        self.frame_2 = _frame_2
-        self.frame_3 = _frame_3
-        self.read_timeout = 0
+    def __init__(self, _app, _gui, _state):
+        #self.connector_list = _connectors
         self.app = _app
+        self.state = _state
+        self.gui = _gui
+        self.ser = serial.Serial()
+        self.frame_1 = self.gui.frame_serial_dash
+        self.frame_2 = self.gui.frame_serial_command
+        self.frame_3 = self.gui.terminal_frame
+        self.read_timeout = 0
         self.baudrate = 9600
         self.timeout = 0.1
         self.wait_timeout = 5
@@ -52,6 +54,11 @@ class SerialManager(object):
         self.button_total_check.grid(row=0,column=0, padx=2, pady=1, sticky="WE")
         self.button_address.grid(row=1,column=0, padx=2, pady=1, sticky="WE")
         self.button_read.grid(row=2,column=0, padx=2, pady=1, sticky="WE")
+
+        self.disable_commands()
+
+    def print_buffer(self):
+        print(self.serial_terminal.serial_buffer)
 
     def get_serial_ports(self):
         '''
@@ -103,92 +110,29 @@ class SerialManager(object):
         self.button_address["state"] = "normal"
         self.button_total_check["state"] = "normal"
         self.button_read["state"] = "normal"   
-        #button_single_check["state"] = "normal"
-        #combobox_address_1["state"] = "normal"
-        #combobox_address_2["state"] = "normal"
-        #label_address_1["state"] = "normal"
-        #label_address_2["state"] = "normal"
-        #label_conn["state"] = "normal"
-        #label_n_pin_con_1["state"] = "normal"
-        #label_n_pin_con_2["state"] = "normal"
-        #ombobox_n_pin_conn_1["state"] = "normal"
-        #combobox_n_pin_conn_2["state"] = "normal"
-        #combobox_conn["state"] = "normal"
-    
+
     def disable_commands(self):
         self.serial_terminal.enable = False
         self.button_address["state"] = "disabled"
         self.button_total_check["state"] = "disabled"
         self.button_read["state"] = "disabled"
-        #button_single_check["state"] = "disabled"
-        #combobox_address_1["state"] = "disabled"
-        #combobox_address_2["state"] = "disabled"
-        #label_address_1["state"] = "disabled"
-        #label_address_2["state"] = "disabled"
-        #label_conn["state"] = "disabled"
-        #label_n_pin_con_1["state"] = "disabled"
-        #label_n_pin_con_2["state"] = "disabled"
-        #combobox_n_pin_conn_1["state"] = "disabled"
-        #combobox_n_pin_conn_2["state"] = "disabled"
-        #combobox_conn["state"] = "disabled"
     
     def total_check(self):
-        print(self.app.connectors)      #QUI SE METTO SELF.CONNECTORS NON SI AGGIORNA AL CAMBIARE DELLA LISTA DEI CONNETTORI DI APP
-        if self.app.selected_connector_1:
-            if self.app.selected_connector_2:
+        print(self.state.connector_list)      #QUI SE METTO SELF.CONNECTOR NON SI AGGIORNA AL CAMBIARE DELLA LISTA DEI CONNETTORI DI APP
+        if self.state.selected_connector_1:
+            if self.state.selected_connector_2:
                 #self.ser.flushInput()
                 self.ser.write(bytes([0b11111111]))
-                print(self.app.selected_connector_1.get_n_pin())
-                print(self.app.selected_connector_2.get_n_pin())
-                self.ser.write(self.app.selected_connector_1.get_name().encode())
+                print(self.state.selected_connector_1.get_n_pin())
+                print(self.state.selected_connector_2.get_n_pin())
+                self.ser.write(self.state.selected_connector_1.get_name().encode())
                 self.ser.write("\n".encode())
-                self.ser.write(self.app.selected_connector_2.get_name().encode())
+                self.ser.write(self.state.selected_connector_2.get_name().encode())
                 self.ser.write("\n".encode())
-                self.ser.write([self.app.selected_connector_1.get_n_pin()])
-                self.ser.write([self.app.selected_connector_2.get_n_pin()])
+                self.ser.write([self.state.selected_connector_1.get_n_pin()])
+                self.ser.write([self.state.selected_connector_2.get_n_pin()])
                 #time.sleep(0.8)
-                self.frame_1.after(2000,self.read_total_check)
-                '''
-                for i in range(self.app.selected_connector_1.get_n_pin()):
-                    for j in range(self.app.selected_connector_2.get_n_pin()):
-                        time_base = time.time()
-                        while(True):
-                            if self.ser.in_waiting:
-                                readed_line = self.ser.read() # b'\x03'
-                                #print("prefisso: ",readed_line)
-                                if readed_line==b'\xff':
-                                    print("EOL find")
-                                    break
-                                elif(time.time()-time_base>self.wait_timeout):
-                                    print("ERROR time elapsed")
-                                    return
-                        time_base = time.time()
-                        while(True):
-                            if self.ser.in_waiting:
-                                readed_line = self.ser.read() # b'\x03'
-                                print("byte letto", readed_line)
-                                #print("prefisso: ",readed_line)
-                                if(readed_line==b'\x0f'):
-                                    print("OK 1 ", j)
-                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 1
-                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 1
-                                    break
-                                elif(readed_line==b'\01'):
-                                    print("OK 2 ", j)
-                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 0
-                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 0
-                                    break
-                                else:
-                                    self.app.continuity[self.app.selected_connector_1.get_name()][self.app.selected_connector_2.get_name()][i][j] = 5
-                                    self.app.continuity[self.app.selected_connector_2.get_name()][self.app.selected_connector_1.get_name()][j][i] = 5
-                                    print("reading ERROR")
-                                    break
-                            elif(time.time()-time_base>self.wait_timeout):
-                                print("ERROR time elapsed with no response")
-                                return
-                print(self.app.continuity)      
-                self.app.grid_matrix.render_2()
-                '''
+                self.frame_1.after(2000,self.read_total_check)                         
             else:
                 print("nessun connettore 2 selezionato")
         else:
@@ -223,18 +167,18 @@ class SerialManager(object):
             for j in range(_n_pin_conn_2):
                 if(_matrix[k]=="1"):
                     print("OK 1 ", j)
-                    self.app.continuity[_n_conn_1][_n_conn_2][i][j] = 1
-                    self.app.continuity[_n_conn_2][_n_conn_1][j][i] = 1
+                    self.state.continuity[_n_conn_1][_n_conn_2][i][j] = 1
+                    self.state.continuity[_n_conn_2][_n_conn_1][j][i] = 1
                 elif(_matrix[k]=="0"):
                     print("OK 2 ", j)
-                    self.app.continuity[_n_conn_1][_n_conn_2][i][j] = 0
-                    self.app.continuity[_n_conn_2][_n_conn_1][j][i] = 0
+                    self.state.continuity[_n_conn_1][_n_conn_2][i][j] = 0
+                    self.state.continuity[_n_conn_2][_n_conn_1][j][i] = 0
                 else:
-                    self.app.continuity[_n_conn_1][_n_conn_2][i][j] = 5
-                    self.app.continuity[_n_conn_2][_n_conn_1][j][i] = 5
+                    self.state.continuity[_n_conn_1][_n_conn_2][i][j] = 5
+                    self.state.continuity[_n_conn_2][_n_conn_1][j][i] = 5
                     print("reading ERROR")
                 k+=2
-        print(self.app.continuity)      
+        print(self.state.continuity)      
         self.app.grid_matrix.render_2()
 
     def find_token(self,_string,_token):
@@ -261,38 +205,12 @@ class SerialManager(object):
                 print("ERROR time elapsed")
                 return
         time.sleep(10)
-        #print(type(listbox_address.curselection())) ---> tupla
-        #print(type(listbox_address.curselection()[0])) ----> di interi
-
-        #_addr_int = listbox_address.curselection()[0]
-        #_addr_int_1 = int(combobox_address_1.get())
-        #_addr_int_2 = int(combobox_address_2.get())
-
-        #INVIA COMANDI
-        #self.ser.write([97]) #manda comando prova
-        #sended_com_byte = ser.write([])
-        #_addr_byte = ser.write([_addr_int]) #in realtà la reference di serial.write() dice che non ci vanno le graffe, ma se non le metto e ci metto 6 ad esempio mi manda 6 byte vuoti.
-        #_addr_byte_1 = ser.write([_addr_int_1])   #ECCERTO CHE MI INVIAVA UNA SERIE DI BYTE, è PERCHE NON è SERIAL.WRITE MA è PYSERIAL.WRITE CHE FUNZIONA DIVERSAMENTE
-        #_addr_byte_2 = ser.write([_addr_int_2])
-        #print("address 1 sended: "+str(_addr_int_1)+" in "+str(_addr_byte_1)+" byte")
-        #print("address 2 sended: "+str(_addr_int_2)+" in "+str(_addr_byte_2)+" byte")
-        
-        #sended_bytes = ser.write([_addr_int])
-        #print("sended "+ str(sended_bytes) +" bytes")
-        #QUI CI VANNO LE GRAFFE!!!! ALTRIMENTI CREA UN VETTORE IMMUTABILE DI X BYTES
-        #_addr_byte = bytes([_addr_int]) #bytes crea invece un vettore di byte di lunghezza pari all'argomento passato
-        #print("address: "+str(_addr_byte))
-        #sended_bytes = ser.write(_addr_byte)
-        #print("sended "+ str(sended_bytes) +" bytes")
-        #sended_bytes1 = ser.write(b'f60')
-        #print(sended_bytes1
-        #sended_bytes2 = ser.write(bytes([10]))
-        #print(sended_bytes2)
 
 class SerialTerminal():
     def __init__(self, _serial, _frame_1):
         self.parent_frame = _frame_1
         self.ser = _serial
+        self.serial_buffer = ""
         self.cmd_frame = tk.Frame(self.parent_frame)
         self.btn_frame = tk.Frame(self.cmd_frame)
         self.label = tk.Label(self.cmd_frame, text="SERIAL TERMINAL", relief="flat", borderwidth=2)
@@ -324,9 +242,8 @@ class SerialTerminal():
 
         self.text.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.text.yview)
-        self.serial_buffer = ""
         
-    
+
     def read_serial(self):
         try:
             if self.enable:
@@ -366,5 +283,5 @@ class SerialTerminal():
 
 if __name__ == "__main__":
     mainframe = tk.Tk()
-    serial_manager = SerialManager(mainframe,None, None, None, None)
+    serial_manager = SerialManager(mainframe,None, None)
     mainframe.mainloop()
