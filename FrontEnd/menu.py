@@ -39,7 +39,6 @@ link:\n\t-> https://github.com/RicciAlessandro/Tester ")
     def new(self):
         _input = messagebox.askyesno("ATTENZIONE",message="Sei sicuro di voler \
 caricare una configurazione vuota?\nI progressi non salvati andranno persi.")
-        print(_input)
         if _input:
             self.app.new_workspace()
     

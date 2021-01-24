@@ -20,7 +20,6 @@ class Front_End():
         self.data_file_stream = DataFileStream(self, self.gui, self.state) # self.continuity
         self.connector_manager = ConnectorManager(self, self.gui, self.state)
         self.serial_manager = SerialManager(self, self.gui, self.state)
-        self.serial_manager.disable_commands()
         self.grid_matrix = GridMatrix(self, self.gui, self.state, 0, 0, "--", "--")
         self.topMenu = TopMenu(self.gui.main_frame,self)
         self.gui.main_frame.config(menu=self.topMenu.menubar)
